@@ -25,7 +25,7 @@ Before running the project, ensure you have:
 
 Clone the repository:
 ```bash
-git clone https://github.com/your-username/pulse-lms.git
+git clone https://github.com/1234qwer926/Pulse_LMS.git
 cd pulse-lms
 npm install
 npm run dev
