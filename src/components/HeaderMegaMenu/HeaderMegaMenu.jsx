@@ -147,9 +147,9 @@ export function HeaderMegaMenu() {
             <a href="#" className={classes.link}>
               Courses
             </a>
-            <a href="#" className={classes.link}>
+            <Link to="/analyticdashboard" className={classes.link}>
               Analytics
-            </a>
+            </Link>
           </Group>
 
           <Group visibleFrom="sm">

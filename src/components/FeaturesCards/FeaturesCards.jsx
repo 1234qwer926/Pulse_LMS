@@ -60,7 +60,7 @@ export function FeaturesCards() {
       </Group> */}
 
       <Title order={2} className={classes.title} ta="center" mt="sm" c={isDark ? 'white' : 'black'}>
-        Key Features of PULSE Pharma LMS
+        Key Features of PULSE LMS
       </Title>
 
       <Text c={isDark ? 'gray.4' : 'dimmed'} className={classes.description} ta="center" mt="md">

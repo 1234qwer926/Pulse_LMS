@@ -1,3 +1,4 @@
+// HeroText.jsx (Adapted for PULSE Pharma LMS with updated title)
 import { Button, Container, Text, Title } from '@mantine/core';
 import { Dots } from './Dots';
 import classes from './HeroText.module.css';
@@ -12,26 +13,25 @@ export function HeroText() {
 
       <div className={classes.inner}>
         <Title className={classes.title}>
-          Automated AI{' '}
+          AI-Automated{' '}
           <Text component="span" className={classes.highlight} inherit>
-            code reviews
+            Learning Management
           </Text>{' '}
-          for any stack
+          System
         </Title>
 
         <Container p={0} size={400}>
           <Text size="lg" c="dimmed" className={classes.description}>
-            Build more reliable software with AI companion. AI is also trained to detect lazy
-            developers who do nothing and just complain on Twitter.
+            Streamline training with mapping, Jotforms, groups, and analytics for compliance and performance.
           </Text>
         </Container>
 
         <div className={classes.controls}>
           <Button className={classes.control} size="lg" variant="default" color="gray">
-            Book a demo
+            Explore
           </Button>
           <Button className={classes.control} size="lg">
-            Purchase a license
+            Start
           </Button>
         </div>
       </div>

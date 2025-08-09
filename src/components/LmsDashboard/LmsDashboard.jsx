@@ -22,7 +22,7 @@ export function LmsDashboard() {
     <Box style={{ background: 'var(--mantine-color-dark-8)', padding: '32px 0' }}>
       <Container size="lg">
         <Title align="center" order={1} style={{ color: 'var(--mantine-color-white)', marginBottom: 24 }}>
-          PULSE Pharma LMS Dashboard
+          PULSE LMS Dashboard
         </Title>
 
         <SimpleGrid cols={{ base: 1, md: 4 }} spacing="xl" mb={40}>
@@ -70,6 +70,7 @@ export function LmsDashboard() {
             </Button>
           </Card>
           </Link>
+          <Link to="/coursemanagment" style={{textDecoration:'none'}}>
           <Card shadow="md" radius="md" p="lg" style={{ background: 'var(--mantine-color-dark-7)' }}>
             <Text size="lg" fw={600} style={{ color: 'var(--mantine-color-white)' }} mb={6}>
               Groups
@@ -81,6 +82,8 @@ export function LmsDashboard() {
               View Groups
             </Button>
           </Card>
+          </Link>
+          
         </SimpleGrid>
 
         {/* <Card shadow="md" radius="md" p="lg" style={{ background: 'var(--mantine-color-dark-7)' }}>
