@@ -1,5 +1,4 @@
-// CourseManagement.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Container,
   Group,
@@ -8,51 +7,30 @@ import {
   Text,
   Title,
 } from '@mantine/core';
-
-// Static object for course data (later replace with API)
-const courseData = {
-  BL: [
-    {
-      courseName: 'Compliance Training',
-      jotformLearning: 'Learning Form 1',
-      jotformAssignment: 'Assignment 1',
-      mindMap: 'Mind Map BL-1',
-    },
-    {
-      courseName: 'GMP Overview',
-      jotformLearning: 'Learning Form 2',
-      jotformAssignment: 'Assignment 2',
-      mindMap: 'Mind Map BL-2',
-    },
-  ],
-  BE: [
-    {
-      courseName: 'Advanced Pharmacology',
-      jotformLearning: 'Learning Form 3',
-      jotformAssignment: 'Assignment 3',
-      mindMap: 'Mind Map BE-1',
-    },
-  ],
-  BM: [
-    {
-      courseName: 'Sales Skill Booster',
-      jotformLearning: 'Learning Form 4',
-      jotformAssignment: 'Assignment 4',
-      mindMap: 'Mind Map BM-1',
-    },
-    {
-      courseName: 'Team Leadership',
-      jotformLearning: 'Learning Form 5',
-      jotformAssignment: 'Assignment 5',
-      mindMap: 'Mind Map BM-2',
-    },
-  ],
-};
+import axios from 'axios';
 
 export function CourseManagement() {
   const [selectedGroup, setSelectedGroup] = useState('BL');
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const courses = courseData[selectedGroup] || [];
+  useEffect(() => {
+    const fetchCourses = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get(`http://localhost:8081/api/courses?group=${selectedGroup}`);
+        setCourses(response.data); // Assuming response.data is an array of courses
+        console.log(response.data);
+      } catch (error) {
+        console.error(`Error fetching courses for group ${selectedGroup}:`, error);
+        setCourses([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourses();
+  }, [selectedGroup]);
 
   return (
     <Container size="lg" py="xl">
@@ -74,7 +52,11 @@ export function CourseManagement() {
         />
       </Group>
 
-      {courses.length > 0 ? (
+      {loading ? (
+        <Text ta="center" c="dimmed">
+          Loading courses...
+        </Text>
+      ) : courses.length > 0 ? (
         <Table highlightOnHover withTableBorder withColumnBorders>
           <Table.Thead>
             <Table.Tr>
@@ -88,9 +70,9 @@ export function CourseManagement() {
             {courses.map((course, index) => (
               <Table.Tr key={index}>
                 <Table.Td>{course.courseName}</Table.Td>
-                <Table.Td>{course.jotformLearning}</Table.Td>
-                <Table.Td>{course.jotformAssignment}</Table.Td>
-                <Table.Td>{course.mindMap}</Table.Td>
+                <Table.Td>{course.learningJotformName}</Table.Td>
+                <Table.Td>{course.assignmentJotformName}</Table.Td>
+                <Table.Td>{course.imageFileName}</Table.Td>
               </Table.Tr>
             ))}
           </Table.Tbody>

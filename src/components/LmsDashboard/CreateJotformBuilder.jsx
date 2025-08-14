@@ -2,7 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import { Paper, Box, Button, TextInput, Group, Text, Divider, ThemeIcon, Stack, Select, NumberInput, Tooltip, ActionIcon, Textarea, FileInput, ScrollArea } from '@mantine/core';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { IconTypography, IconTextSize, IconArrowsVertical, IconLineDashed, IconMusic, IconVideo, IconClock, IconListNumbers, IconList, IconSettings, IconEye, IconTrash, IconUpload, IconPhoto } from '@tabler/icons-react';
+import { IconTypography, IconTextSize, IconArrowsVertical, IconLineDashed, IconMusic, IconVideo, IconClock, IconListNumbers, IconList, IconSettings, IconEye, IconTrash, IconUpload, IconPhoto, IconBrain, IconLink } from '@tabler/icons-react';
+import { useLocation } from 'react-router-dom';
+import { notifications } from '@mantine/notifications';
+import axios from 'axios';
 
 const FORM_ELEMENTS = [
   { type: 'heading', label: 'Heading', icon: IconTypography },
@@ -170,10 +173,10 @@ function getElementComponent(element, onEdit, isSelected, onDelete, onShowProper
           <Box style={{ 
             textAlign: element.align || 'left'
           }} onClick={onEdit}>
-            {element.fileName ? (
+            {element.url || element.fileUrl ? (
               <img 
-                src={element.fileUrl} 
-                alt={element.fileName}
+                src={element.url || element.fileUrl} 
+                alt={element.fileName || 'Image'}
                 style={{ 
                   maxWidth: element.width ? `${element.width}px` : '100%',
                   height: element.height ? `${element.height}px` : 'auto',
@@ -217,9 +220,9 @@ function getElementComponent(element, onEdit, isSelected, onDelete, onShowProper
           <Box style={{ 
             textAlign: element.align || 'left'
           }} onClick={onEdit}>
-            {element.fileName ? (
+            {element.url || element.fileUrl ? (
               <div>
-                <Text size="sm" fw={500} mb={8}>Audio: {element.fileName}</Text>
+                <Text size="sm" fw={500} mb={8}>Audio: {element.fileName || 'From URL'}</Text>
                 <audio 
                   controls 
                   style={{ 
@@ -227,7 +230,7 @@ function getElementComponent(element, onEdit, isSelected, onDelete, onShowProper
                     height: element.height ? `${element.height}px` : 'auto',
                   }}
                 >
-                  <source src={element.fileUrl} type="audio/mpeg" />
+                  <source src={element.url || element.fileUrl} type="audio/mpeg" />
                   Your browser does not support the audio element.
                 </audio>
               </div>
@@ -254,9 +257,9 @@ function getElementComponent(element, onEdit, isSelected, onDelete, onShowProper
           <Box style={{ 
             textAlign: element.align || 'left'
           }} onClick={onEdit}>
-            {element.fileName ? (
+            {element.url || element.fileUrl ? (
               <div>
-                <Text size="sm" fw={500} mb={8}>Video: {element.fileName}</Text>
+                <Text size="sm" fw={500} mb={8}>Video: {element.fileName || 'From URL'}</Text>
                 <video 
                   controls 
                   style={{ 
@@ -264,7 +267,7 @@ function getElementComponent(element, onEdit, isSelected, onDelete, onShowProper
                     height: element.height ? `${element.height}px` : 'auto',
                   }}
                 >
-                  <source src={element.fileUrl} type="video/mp4" />
+                  <source src={element.url || element.fileUrl} type="video/mp4" />
                   Your browser does not support the video element.
                 </video>
               </div>
@@ -342,11 +345,13 @@ function getElementComponent(element, onEdit, isSelected, onDelete, onShowProper
 
 function PropertiesPanel({ selectedElement, onPropertyChange, onClose }) {
   const [listItemsText, setListItemsText] = useState('');
+  const [mediaUrl, setMediaUrl] = useState(selectedElement?.url || '');
 
   React.useEffect(() => {
     if (selectedElement?.listItems) {
       setListItemsText(selectedElement.listItems.join('\n'));
     }
+    setMediaUrl(selectedElement?.url || '');
   }, [selectedElement]);
 
   if (!selectedElement) {
@@ -363,7 +368,16 @@ function PropertiesPanel({ selectedElement, onPropertyChange, onClose }) {
       const fileUrl = URL.createObjectURL(file);
       onPropertyChange('fileName', file.name);
       onPropertyChange('fileUrl', fileUrl);
+      onPropertyChange('url', ''); // Clear URL if file is uploaded
+      setMediaUrl(''); // Clear local URL state
     }
+  };
+
+  const handleUrlChange = (value) => {
+    setMediaUrl(value);
+    onPropertyChange('url', value);
+    onPropertyChange('fileName', null); // Clear file if URL is provided
+    onPropertyChange('fileUrl', null);
   };
 
   const handleListItemsChange = (value) => {
@@ -434,25 +448,39 @@ function PropertiesPanel({ selectedElement, onPropertyChange, onClose }) {
               </Box>
             )}
 
-            {/* File upload for image/audio/video */}
+            {/* File upload or URL for image/audio/video */}
             {(['image', 'audio', 'video'].includes(selectedElement.type)) && (
               <Box>
                 <Text size="sm" mb={4}>
-                  {selectedElement.type === 'image' ? 'Image File' : 
-                   selectedElement.type === 'audio' ? 'Audio File' : 'Video File'}
+                  {selectedElement.type === 'image' ? 'Image File or URL' : 
+                   selectedElement.type === 'audio' ? 'Audio File or URL' : 'Video File or URL'}
                 </Text>
+                <TextInput
+                  placeholder="Enter URL (e.g. https://example.com/media.mp4)"
+                  leftSection={<IconLink size={16} />}
+                  value={mediaUrl}
+                  onChange={(e) => handleUrlChange(e.target.value)}
+                  mb="md"
+                  disabled={!!selectedElement.fileUrl} // Disable URL if file is uploaded
+                />
                 <FileInput
-                  placeholder={`Choose ${selectedElement.type} file`}
+                  placeholder={`Or upload ${selectedElement.type} file`}
                   accept={
                     selectedElement.type === 'image' ? 'image/*' : 
                     selectedElement.type === 'audio' ? 'audio/*' : 'video/*'
                   }
                   onChange={handleFileUpload}
                   leftSection={<IconUpload size={14} />}
+                  disabled={!!mediaUrl} // Disable file upload if URL is provided
                 />
                 {selectedElement.fileName && (
                   <Text size="xs" color="green" mt={4}>
                     Current file: {selectedElement.fileName}
+                  </Text>
+                )}
+                {mediaUrl && (
+                  <Text size="xs" color="green" mt={4}>
+                    Using URL: {mediaUrl}
                   </Text>
                 )}
               </Box>
@@ -550,12 +578,21 @@ function PropertiesPanel({ selectedElement, onPropertyChange, onClose }) {
   );
 }
 
-export function CreateJotformBuilder({ jotformName = "New Jotform" }) {
+export function CreateJotformBuilder() {
+  const location = useLocation();
+  const [jotformName, setJotformName] = useState("New Jotform");
   const [pages, setPages] = useState([[]]);
   const [currentPage, setCurrentPage] = useState(0);
   const [selectedElementIndex, setSelectedElementIndex] = useState(null);
   const [showProperties, setShowProperties] = useState(false);
   const [isPreview, setIsPreview] = useState(false);
+
+  // Get jotform name from navigation state
+  useEffect(() => {
+    if (location.state?.jotformName) {
+      setJotformName(location.state.jotformName);
+    }
+  }, [location.state]);
 
   const onDragEnd = (result) => {
     const { source, destination } = result;
@@ -622,8 +659,115 @@ export function CreateJotformBuilder({ jotformName = "New Jotform" }) {
   };
 
   const handleSubmit = () => {
-    console.log('Form submitted!', pages);
+    console.log('Form submitted!', { jotformName, pages });
     // Handle form submission
+  };
+
+  // Create Learning Material function - Updated to process all pages and post to backend
+  const handleCreateLearningMaterial = async () => {
+    const allPagesData = pages.map((pageElements, pageIndex) => {
+      const elementsData = pageElements.map((element, elementIndex) => {
+        let content;
+        
+        // Extract content based on element type
+        switch (element.type) {
+          case 'heading':
+          case 'paragraph':
+            content = element.content || `Default ${element.type} content`;
+            break;
+          case 'image':
+          case 'audio':
+          case 'video':
+            if (element.url) {
+              content = element.url; // Provide URL as string
+            } else if (element.fileName) {
+              // Provide file info as JSON object
+              content = {
+                fileName: element.fileName,
+                fileUrl: element.fileUrl,
+                mimeType: element.mimeType || 'application/octet-stream',
+                size: element.fileSize || 0
+              };
+            } else {
+              content = `No content for ${element.type}`;
+            }
+            break;
+          case 'orderedlist':
+          case 'unorderedlist':
+            content = element.listItems ? element.listItems.join(', ') : `Default list items for ${element.type}`;
+            break;
+          case 'timer':
+            content = 'Timer element - tracks time spent on page';
+            break;
+          case 'breakline':
+            content = 'Line break';
+            break;
+          case 'horizontalline':
+            content = 'Horizontal divider line';
+            break;
+          default:
+            content = `${element.type} element`;
+            break;
+        }
+
+        return {
+          id: element.id || `element_${pageIndex}_${elementIndex}`,
+          tagName: element.type,
+          elementName: element.label || element.type,
+          content: content,
+          sequence: elementIndex + 1,
+          page: pageIndex + 1
+        };
+      });
+
+      return {
+        page: pageIndex + 1,
+        totalElements: elementsData.length,
+        elements: elementsData
+      };
+    });
+
+    // Prepare full data
+    const fullData = {
+      jotformName: jotformName,
+      totalPages: pages.length,
+      pages: allPagesData
+    };
+
+    // Console log the formatted data for all pages
+    console.log('=== LEARNING MATERIAL DATA (ALL PAGES) ===');
+    console.log('Jotform Name:', jotformName);
+    console.log('Total Pages:', pages.length);
+    console.log('All Pages Data:', fullData);
+    console.log('Detailed Pages:');
+    allPagesData.forEach(page => {
+      console.log(`\nPage ${page.page} (Total Elements: ${page.totalElements}):`);
+      console.table(page.elements);
+    });
+    console.log('=======================================');
+
+    // Post the data to backend using Axios
+    try {
+      const response = await axios.post('http://localhost:8081/api/jotforms', fullData, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      notifications.show({
+        title: 'Success!',
+        message: 'Learning material saved successfully',
+        color: 'green'
+      });
+      console.log('✅ Saved to database:', response.data);
+    } catch (error) {
+      console.error('❌ Failed to save learning material:', error);
+      notifications.show({
+        title: 'Error',
+        message: 'Failed to save learning material. Please try again.',
+        color: 'red'
+      });
+    }
   };
 
   const isFirstPage = currentPage === 0;
@@ -636,6 +780,15 @@ export function CreateJotformBuilder({ jotformName = "New Jotform" }) {
         <Group>
           <Button size="sm" variant="white" leftSection={<IconEye size={16} />} onClick={() => setIsPreview(!isPreview)}>
             {isPreview ? 'Edit' : 'Preview'}
+          </Button>
+          <Button 
+            size="sm" 
+            variant="white" 
+            leftSection={<IconBrain size={16} />} 
+            onClick={handleCreateLearningMaterial}
+            style={{ background: '#4CAF50', color: 'white', border: 'none' }}
+          >
+            Create Learning Material
           </Button>
         </Group>
         

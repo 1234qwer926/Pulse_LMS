@@ -9,10 +9,12 @@ import {
   TextInput,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { Link } from 'react-router-dom';
-import classes from '../AuthenticationForm/AuthenticationForm.module.css'; // Reuse the same CSS module for similar styling (adjust path if needed)
+import { useNavigate } from 'react-router-dom';
+import classes from '../AuthenticationForm/AuthenticationForm.module.css';
 
 export function CreateJotform(props) {
+  const navigate = useNavigate();
+  
   const form = useForm({
     initialValues: {
       jotformName: '',
@@ -23,23 +25,30 @@ export function CreateJotform(props) {
     },
   });
 
+  const handleSubmit = (values) => {
+    console.log('Creating Jotform:', values);
+    // Navigate to jotform builder with the form name
+    navigate('/jotformbuilder', {
+      state: { jotformName: values.jotformName }
+    });
+  };
+
   return (
     <Paper
-      className={classes.formPaper} // Reuse class for centering and responsive styles
+      className={classes.formPaper}
       radius="md"
       p="lg"
       withBorder
       {...props}
-      style={{ maxWidth: '400px', margin: '0 auto' }} // Default centering
+      style={{ maxWidth: '400px', margin: '0 auto' }}
     >
-        
-      <Text size="lg" fw={500} ta="center"> {/* Centered title */}
+      <Text size="lg" fw={500} ta="center">
         Create Jotform
       </Text>
         
       <Divider label="Enter Jotform details" labelPosition="center" my="lg" />
 
-      <form onSubmit={form.onSubmit((values) => console.log('Creating Jotform:', values))}> {/* Handle submission as needed */}
+      <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack>
           <TextInput
             required
@@ -52,12 +61,10 @@ export function CreateJotform(props) {
           />
         </Stack>
 
-        <Group justify="center" mt="xl"> {/* Centered button */}
-            <Link to="/jotformbuilder" style={{textDecoration:'none'}}>
+        <Group justify="center" mt="xl">
           <Button type="submit" radius="xl">
             Create Form
           </Button>
-          </Link>
         </Group>
       </form>
     </Paper>

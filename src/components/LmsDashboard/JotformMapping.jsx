@@ -1,4 +1,4 @@
-// JotformMapping.jsx
+import React, { useEffect, useState } from 'react';
 import {
   Button,
   Divider,
@@ -9,34 +9,61 @@ import {
   Select,
   Stack,
   Text,
+  TextInput,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import classes from '../AuthenticationForm/AuthenticationForm.module.css'; // Reuse the same CSS module for similar styling (adjust path if needed)
-import { useState } from 'react';
+import axios from 'axios';
 
-// Static lists (later replace with backend data)
-const COURSE_NAMES = [
-  'Compliance Training',
-  'GMP Overview',
-  'Advanced Pharmacology',
-  'Sales Skill Booster',
-  'Team Leadership',
-];
 
-const JOTFORM_NAMES = [
-  'Learning Form 1',
-  'Learning Form 2',
-  'Assignment 1',
-  'Assignment 2',
-  'Assignment 3',
-];
+import classes from '../AuthenticationForm/AuthenticationForm.module.css';
+
 
 const GROUPS = ['BL', 'BE', 'BM'];
 
-export function JotformMapping(props) {
-  const [formType, setFormType] = useState('learning'); // Default to 'learning'
 
-  // Form for Jotform Learning (with image and PDF)
+export function JotformMapping(props) {
+  const [formType, setFormType] = useState('learning');
+  const [loadingForms, setLoadingForms] = useState(false);
+  const [jotformNames, setJotformNames] = useState([]);
+  const [courseNames, setCourseNames] = useState([]); // New state for existing courses
+  const [loadingCourses, setLoadingCourses] = useState(false);
+
+
+  const fetchJotformNames = async () => {
+    setLoadingForms(true);
+    try {
+      const response = await axios.get('http://localhost:8081/api/jotforms/names');
+      setJotformNames(response.data);
+    } catch (error) {
+      console.error('Error fetching jotform names', error);
+      setJotformNames([]);
+    } finally {
+      setLoadingForms(false);
+    }
+  };
+
+
+  const fetchExistingCourses = async () => {
+    setLoadingCourses(true);
+    try {
+      const response = await axios.get('http://localhost:8081/api/courses/names');
+      setCourseNames(response.data); // Assuming response is a list of distinct course names
+    } catch (error) {
+      console.error('Error fetching existing courses', error);
+      setCourseNames([]);
+    } finally {
+      setLoadingCourses(false);
+    }
+  };
+
+
+  useEffect(() => {
+    fetchJotformNames();
+    fetchExistingCourses(); // Fetch courses for assignment mapping
+  }, []);
+
+
+  // learning form (unchanged, for new course creation)
   const learningForm = useForm({
     initialValues: {
       courseName: '',
@@ -45,44 +72,93 @@ export function JotformMapping(props) {
       imageFile: null,
       pdfFile: null,
     },
-
     validate: {
-      courseName: (val) => (val ? null : 'Please select a course name'),
-      jotformName: (val) => (val ? null : 'Please select a Jotform name'),
+      courseName: (val) => (val.trim().length > 0 ? null : 'Please enter a course name'),
+      jotformName: (val) => (val ? null : 'Please select a Jotform'),
       group: (val) => (val ? null : 'Please select a group'),
     },
   });
 
-  // Form for Jotform Assignment (without image and PDF)
+
+  const submitLearningForm = async (values) => {
+    try {
+      const formData = new FormData();
+      formData.append('courseName', values.courseName);
+      formData.append('jotformName', values.jotformName);
+      formData.append('group', values.group);
+      if (values.imageFile) formData.append('imageFile', values.imageFile);
+      if (values.pdfFile) formData.append('pdfFile', values.pdfFile);
+
+
+      const response = await axios.post('http://localhost:8081/api/courses/learning', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+
+      console.log('Mapping submission response:', response.data);
+      alert('Learning form mapped successfully!');
+    } catch (error) {
+      console.error('Error submitting learning form mapping', error);
+      alert('Failed to submit mapping');
+    }
+  };
+
+
+  // assignment form (updated to select from existing courses)
   const assignmentForm = useForm({
     initialValues: {
-      courseName: '',
+      courseName: '', // Now selected from existing
       jotformName: '',
       group: '',
     },
-
     validate: {
       courseName: (val) => (val ? null : 'Please select a course name'),
-      jotformName: (val) => (val ? null : 'Please select a Jotform name'),
+      jotformName: (val) => (val ? null : 'Please select a jotform'),
       group: (val) => (val ? null : 'Please select a group'),
     },
   });
 
+
+  const submitAssignmentForm = async (values) => {
+    try {
+      const payload = {
+        courseName: values.courseName,
+        jotformName: values.jotformName,
+        group: values.group,
+      };
+
+
+      const response = await axios.post('http://localhost:8081/api/courses/assignment', payload, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+
+      console.log('Assignment mapping response:', response.data);
+      alert('Assignment form mapped successfully!');
+    } catch (error) {
+      console.error('Error submitting assignment mapping', error);
+      alert('Failed to submit assignment mapping');
+    }
+  };
+
+
   return (
     <Paper
-      className={classes.formPaper} // Reuse class for centering and responsive styles
+      className={classes.formPaper}
       radius="md"
       p="lg"
       withBorder
       {...props}
-      style={{ maxWidth: '400px', margin: '0 auto' }} // Default centering
+      style={{ maxWidth: 400, margin: '0 auto' }}
     >
-      <Text size="lg" fw={500} ta="center"> {/* Centered title */}
-        Jotform Mapping
-      </Text>
+      <Text size="lg" fw={500} ta="center">Jotform Mapping</Text>
 
-      {/* Toggle button centered at the top */}
-      <Group justify="center" mt="md" mb="lg">
+
+      <Group position="center" mt="md" mb="lg">
         <SegmentedControl
           value={formType}
           onChange={setFormType}
@@ -95,115 +171,122 @@ export function JotformMapping(props) {
         />
       </Group>
 
+
       <Divider label="Select mapping details" labelPosition="center" my="lg" />
 
+
       {formType === 'learning' ? (
-        // Learning Form
-        <form onSubmit={learningForm.onSubmit((values) => console.log('Mapping Jotform Learning:', values))}>
+        <form onSubmit={learningForm.onSubmit(submitLearningForm)}>
           <Stack>
-            <Select
-              required
+            <TextInput
               label="Course Name"
-              placeholder="Select course"
-              data={COURSE_NAMES}
+              placeholder="Enter course name"
+              required
               value={learningForm.values.courseName}
-              onChange={(value) => learningForm.setFieldValue('courseName', value)}
-              error={learningForm.errors.courseName && 'Please select a course name'}
+              onChange={(e) => learningForm.setFieldValue('courseName', e.currentTarget.value)}
+              error={learningForm.errors.courseName}
               radius="md"
             />
 
+
             <Select
-              required
               label="Jotform Name"
-              placeholder="Select Jotform"
-              data={JOTFORM_NAMES}
+              placeholder={loadingForms ? 'Loading...' : 'Select existing jotform'}
+              required
+              searchable
+              data={jotformNames}
               value={learningForm.values.jotformName}
-              onChange={(value) => learningForm.setFieldValue('jotformName', value)}
-              error={learningForm.errors.jotformName && 'Please select a Jotform name'}
+              onChange={(val) => learningForm.setFieldValue('jotformName', val)}
+              error={learningForm.errors.jotformName}
               radius="md"
+              disabled={loadingForms}
             />
 
+
             <Select
-              required
               label="Group"
               placeholder="Select group"
+              required
               data={GROUPS}
               value={learningForm.values.group}
-              onChange={(value) => learningForm.setFieldValue('group', value)}
-              error={learningForm.errors.group && 'Please select a group'}
+              onChange={(val) => learningForm.setFieldValue('group', val)}
+              error={learningForm.errors.group}
               radius="md"
             />
+
 
             <FileInput
               label="Upload Image"
               placeholder="Select image file"
-              accept="image/*" // Restrict to images
+              accept="image/*"
               value={learningForm.values.imageFile}
               onChange={(file) => learningForm.setFieldValue('imageFile', file)}
               radius="md"
               clearable
             />
 
+
             <FileInput
               label="Upload PDF"
-              placeholder="Select PDF file"
-              accept="application/pdf" // Restrict to PDFs
+              placeholder="Select pdf file"
+              accept="application/pdf"
               value={learningForm.values.pdfFile}
               onChange={(file) => learningForm.setFieldValue('pdfFile', file)}
               radius="md"
               clearable
             />
-          </Stack>
 
-          <Group justify="center" mt="xl"> {/* Centered button */}
-            <Button type="submit" radius="xl">
-              Map Jotform Learning
+
+            <Button type="submit" radius="xl" mt="md">
+              Map Learning Jotform
             </Button>
-          </Group>
+          </Stack>
         </form>
       ) : (
-        // Assignment Form
-        <form onSubmit={assignmentForm.onSubmit((values) => console.log('Mapping Jotform Assignment:', values))}>
+        <form onSubmit={assignmentForm.onSubmit(submitAssignmentForm)}>
           <Stack>
             <Select
-              required
               label="Course Name"
-              placeholder="Select course"
-              data={COURSE_NAMES}
+              placeholder={loadingCourses ? 'Loading...' : 'Select existing course'}
+              required
+              searchable
+              data={courseNames}
               value={assignmentForm.values.courseName}
-              onChange={(value) => assignmentForm.setFieldValue('courseName', value)}
-              error={assignmentForm.errors.courseName && 'Please select a course name'}
+              onChange={(val) => assignmentForm.setFieldValue('courseName', val)}
+              error={assignmentForm.errors.courseName}
               radius="md"
+              disabled={loadingCourses}
             />
 
+
             <Select
-              required
               label="Jotform Name"
-              placeholder="Select Jotform"
-              data={JOTFORM_NAMES}
+              placeholder="Select jotform"
+              required
+              data={jotformNames}
               value={assignmentForm.values.jotformName}
-              onChange={(value) => assignmentForm.setFieldValue('jotformName', value)}
-              error={assignmentForm.errors.jotformName && 'Please select a Jotform name'}
+              onChange={(val) => assignmentForm.setFieldValue('jotformName', val)}
+              error={assignmentForm.errors.jotformName}
               radius="md"
             />
 
+
             <Select
-              required
               label="Group"
               placeholder="Select group"
+              required
               data={GROUPS}
               value={assignmentForm.values.group}
-              onChange={(value) => assignmentForm.setFieldValue('group', value)}
-              error={assignmentForm.errors.group && 'Please select a group'}
+              onChange={(val) => assignmentForm.setFieldValue('group', val)}
+              error={assignmentForm.errors.group}
               radius="md"
             />
-          </Stack>
 
-          <Group justify="center" mt="xl"> {/* Centered button */}
-            <Button type="submit" radius="xl">
-              Map Jotform Assignment
+
+            <Button type="submit" radius="xl" mt="md">
+              Map Assignment Jotform
             </Button>
-          </Group>
+          </Stack>
         </form>
       )}
     </Paper>
