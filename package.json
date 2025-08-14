@@ -11,10 +11,9 @@
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
-    "@mantine/core": "^8.2.4",
+    "@mantine/core": "^8.2.3",
     "@mantine/form": "^8.2.4",
-    "@mantine/hooks": "^8.2.4",
-    "@mantine/notifications": "^8.2.4",
+    "@mantine/hooks": "^8.2.3",
     "@mantinex/dev-icons": "^2.0.0",
     "@mantinex/mantine-logo": "^2.0.0",
     "@tabler/icons-react": "^3.34.1",
@@ -35,3 +34,4 @@
     "vite": "^7.0.4"
   }
 }
+
