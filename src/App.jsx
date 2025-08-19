@@ -13,6 +13,8 @@ import { CreateJotformBuilder } from './components/LmsDashboard/CreateJotformBui
 import { JotformMapping } from './components/LmsDashboard/JotformMapping';
 import { CourseManagement } from './components/LmsDashboard/CourseManagement';
 import { AnalyticLeaderDashboard } from './components/AnalyticLeaderDashboard/AnalyticLeaderDashboard';
+import { Course } from './components/Course/Course';
+import { JotformViewer } from './components/Course/JotformViewer';
 import './App.css'
 
 function App() {
@@ -37,6 +39,8 @@ function App() {
           <Route path="/jotformmapping" element={<JotformMapping />} />
           <Route path="/coursemanagment" element={<CourseManagement />} />
           <Route path="/analyticdashboard" element={<AnalyticLeaderDashboard />} />
+          <Route path="/course" element={<Course />} />
+          <Route path="/jotformviewer" element={<JotformViewer />} />
         </Routes>
         <FooterLinks/>
       </Router>

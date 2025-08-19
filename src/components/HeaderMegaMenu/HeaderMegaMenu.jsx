@@ -144,9 +144,9 @@ export function HeaderMegaMenu() {
             <Link to="/lmsdashboard" className={classes.link}>
               LMS Dashboard
              </Link>
-            <a href="#" className={classes.link}>
+            <Link to="/course" className={classes.link}>
               Courses
-            </a>
+            </Link>
             <Link to="/analyticdashboard" className={classes.link}>
               Analytics
             </Link>

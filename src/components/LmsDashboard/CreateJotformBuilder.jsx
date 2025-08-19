@@ -748,6 +748,7 @@ export function CreateJotformBuilder() {
 
     // Post the data to backend using Axios
     try {
+      console.log(fullData);
       const response = await axios.post('http://localhost:8081/api/jotforms', fullData, {
         headers: {
           'Content-Type': 'application/json',
@@ -759,7 +760,9 @@ export function CreateJotformBuilder() {
         message: 'Learning material saved successfully',
         color: 'green'
       });
+      
       console.log('✅ Saved to database:', response.data);
+      console.log(fullData);
     } catch (error) {
       console.error('❌ Failed to save learning material:', error);
       notifications.show({
