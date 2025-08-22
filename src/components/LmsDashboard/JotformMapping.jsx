@@ -89,7 +89,7 @@ export function JotformMapping(props) {
       if (values.imageFile) formData.append('imageFile', values.imageFile);
       if (values.pdfFile) formData.append('pdfFile', values.pdfFile);
 
-
+      console.log(formData)
       const response = await axios.post('http://localhost:8081/api/courses/learning', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
