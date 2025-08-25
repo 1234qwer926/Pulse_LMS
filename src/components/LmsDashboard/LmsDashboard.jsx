@@ -30,28 +30,28 @@ export function LmsDashboard() {
             <Card shadow="md" radius="md" p="lg" style={{ background: 'var(--mantine-color-dark-7)' }}>
             
             <Text size="lg" fw={600} style={{ color: 'var(--mantine-color-white)' }} mb={6}>
-            User Mapping
+            User Managment
             </Text>
             
             <Text size="sm" color="dimmed" mb="md">
-              Map users to groups for targeted learning.
+              Create,Read,Update and Delete Map users to groups for targeted learning.
             </Text>
             <Button variant="light" color="blue" fullWidth>
-              Map User
+              User Managment
             </Button>
           </Card>
           </Link>
-          <Link to="/createjotform" style={{textDecoration:'none'}}>
+          <Link to="/jotformmanagment" style={{textDecoration:'none'}}>
           <Card shadow="md" radius="md" p="lg" style={{ background: 'var(--mantine-color-dark-7)' }}>
             <Text size="lg" fw={600} style={{ color: 'var(--mantine-color-white)' }} mb={6}>
-              Jotform Creation
+              Jotform Managment
             </Text>
             <Text size="sm" color="dimmed" mb="md">
-              Create new learning or assignment forms.
+              Create,Read,Update and Delete  learning Material or assignment Materials.
             </Text>
             
             <Button variant="light" color="blue" fullWidth>
-              Create Jotform
+              Jotform Managment
             </Button>
             
             
@@ -60,13 +60,13 @@ export function LmsDashboard() {
           <Link to="/jotformmapping" style={{textDecoration:'none'}}>
           <Card shadow="md" radius="md" p="lg" style={{ background: 'var(--mantine-color-dark-7)' }}>
             <Text size="lg" fw={600} style={{ color: 'var(--mantine-color-white)' }} mb={6}>
-              Jotform Mapping
+              Course Managment
             </Text>
             <Text size="sm" color="dimmed" mb="md">
-              Assign Jotforms to courses for each group.
+              Create,Read,Update and Delete  Jotforms to courses for each group.
             </Text>
             <Button variant="light" color="blue" fullWidth>
-              Map Jotform
+              Course Mangment
             </Button>
           </Card>
           </Link>
