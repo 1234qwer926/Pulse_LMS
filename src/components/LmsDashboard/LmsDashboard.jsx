@@ -21,7 +21,7 @@ export function LmsDashboard() {
 
         <SimpleGrid cols={{ base: 1, md: 4 }} spacing="xl" mb={40}>
           {/* Card 1: User Management */}
-          <Link to="/mapuser" style={{ textDecoration: 'none', height: '100%' }}>
+          <Link to="/usermanagment" style={{ textDecoration: 'none', height: '100%' }}>
             <Card
               shadow="md"
               radius="md"

@@ -1,4 +1,4 @@
-// UserMapping.jsx (Updated with API call to port 8081)
+// UserMapping.jsx (Updated to be used in a modal)
 import { useState } from 'react';
 import {
   Button,
@@ -11,12 +11,12 @@ import {
   TextInput,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import classes from '../AuthenticationForm/AuthenticationForm.module.css';
 
-export function UserMapping(props) {
+// No need to import classes if it's only for centering, as the modal handles it.
+
+export function UserMapping({ onSuccess, onClose }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
 
   const form = useForm({
     initialValues: {
@@ -29,54 +29,50 @@ export function UserMapping(props) {
     },
   });
 
-  const handleSubmit = async (values) => {
-    setLoading(true);
-    setError('');
-    setSuccess('');
+  // In UserMapping.jsx
 
-    try {
-      // *** THE ONLY CHANGE IS HERE: Updated port to 8081 ***
-      const response = await fetch('http://localhost:8081/api/mappings/map-user', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: values.email, groupName: values.group }),
-      });
+const handleSubmit = async (values) => {
+  setLoading(true);
+  setError('');
 
-      if (!response.ok) {
-        const errorData = await response.text();
-        throw new Error(errorData || 'Failed to map user. Please try again.');
-      }
+  try {
+    // --- CORRECTED URL ---
+    // Change this from /api/mappings/map-user to /api/user-mappings
+    const response = await fetch('http://localhost:8081/api/user-mappings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: values.email, groupName: values.group }),
+    });
 
-      const result = await response.json();
-      console.log('Successfully mapped user:', result);
-      setSuccess(`User ${result.email} successfully mapped to group ${result.groupName}!`);
-      form.reset();
-    } catch (err) {
-      setError(err.message);
-      console.error('Submission error:', err);
-    } finally {
-      setLoading(false);
+    if (!response.ok) {
+      const errorData = await response.text();
+      throw new Error(errorData || 'Failed to map user.');
     }
-  };
+
+    const result = await response.json();
+    console.log('Successfully mapped user:', result);
+    
+    if (onSuccess) {
+      onSuccess(result);
+    }
+    
+  } catch (err) {
+    setError(err.message);
+    console.error('Submission error:', err);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
-    <Paper
-      className={classes.formPaper}
-      radius="md"
-      p="lg"
-      withBorder
-      {...props}
-      style={{ maxWidth: '400px', margin: '0 auto' }}
-    >
-      <Text size="lg" fw={500} ta="center">
-        Map User to Group
+    // Using Paper for structure within the modal, but without extra styling
+    <Paper p="md" shadow="none">
+      {/* The modal provides the main title, so this can be a subtitle or removed */}
+      <Text size="lg" fw={500} ta="center" mb="lg">
+        Enter User Details
       </Text>
 
-      <Divider label="Enter user details" labelPosition="center" my="lg" />
-
-      {success && <Text c="teal" ta="center" pb="md">{success}</Text>}
       {error && <Text c="red" ta="center" pb="md">{error}</Text>}
 
       <form onSubmit={form.onSubmit(handleSubmit)}>
@@ -85,9 +81,7 @@ export function UserMapping(props) {
             required
             label="User Email"
             placeholder="user@example.com"
-            value={form.values.email}
-            onChange={(event) => form.setFieldValue('email', event.currentTarget.value)}
-            error={form.errors.email}
+            {...form.getInputProps('email')}
             radius="md"
           />
           <Select
@@ -95,13 +89,12 @@ export function UserMapping(props) {
             label="Select Group"
             placeholder="Choose a group"
             data={['BL', 'BE', 'BM']}
-            value={form.values.group}
-            onChange={(value) => form.setFieldValue('group', value)}
-            error={form.errors.group}
+            {...form.getInputProps('group')}
             radius="md"
           />
         </Stack>
-        <Group justify="center" mt="xl">
+        <Group justify="flex-end" mt="xl">
+          {onClose && <Button variant="default" onClick={onClose}>Cancel</Button>}
           <Button type="submit" radius="xl" loading={loading}>
             Map User to Group
           </Button>

@@ -10,8 +10,10 @@ import {
   ActionIcon,
   Loader,
   Center,
+  Tooltip, // Added for better UX
 } from '@mantine/core';
 import { IconPencil, IconTrash } from '@tabler/icons-react';
+import { modals } from '@mantine/modals'; // 1. Import the modals manager
 import axios from 'axios';
 import { CreateJotform } from './CreateJotform';
 
@@ -23,7 +25,6 @@ export function JotformManagement() {
   const fetchJotforms = async () => {
     setLoading(true);
     try {
-      // Corrected to use the standard REST endpoint for getting all resources
       const response = await axios.get('http://localhost:8081/api/jotforms');
       setJotforms(response.data);
     } catch (error) {
@@ -43,30 +44,59 @@ export function JotformManagement() {
     alert('Edit functionality to be implemented.');
   };
 
-  // This handleDelete function correctly calls the new backend endpoint
-  const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this form?')) {
-      try {
-        await axios.delete(`http://localhost:8081/api/jotforms/${id}`);
-        fetchJotforms(); // Refresh the list after successful deletion
-      } catch (error) {
-        console.error(`Error deleting jotform ${id}:`, error);
-        alert('Failed to delete Jotform.');
-      }
+  // --- NEW DELETE MODAL LOGIC ---
+
+  // 2. Handles the actual API call after confirmation
+  const confirmDelete = async (formToDelete) => {
+    try {
+      await axios.delete(`http://localhost:8081/api/jotforms/${formToDelete.id}`);
+      // Update state immediately for a responsive UI
+      setJotforms((currentForms) =>
+        currentForms.filter((form) => form.id !== formToDelete.id)
+      );
+      // Optionally, add a success notification here
+    } catch (error) {
+      console.error(`Error deleting jotform ${formToDelete.id}:`, error);
+      alert('Failed to delete Jotform.');
     }
   };
+
+  // 3. Opens the confirmation modal
+  const openDeleteModal = (form) => {
+    modals.openConfirmModal({
+      title: 'Delete Jotform',
+      centered: true,
+      children: (
+        <Text size="sm">
+          Are you sure you want to delete the form{' '}
+          <Text span fw={700}>"{form.jotformName}"</Text>?
+          This action is permanent.
+        </Text>
+      ),
+      labels: { confirm: 'Delete Jotform', cancel: 'Cancel' },
+      confirmProps: { color: 'red' },
+      onConfirm: () => confirmDelete(form),
+    });
+  };
+
+  // --- RENDER LOGIC ---
 
   const rows = jotforms.map((form) => (
     <Table.Tr key={form.id}>
       <Table.Td>{form.jotformName}</Table.Td>
       <Table.Td>
         <Group gap="sm">
-          <ActionIcon variant="subtle" color="blue" onClick={() => handleEdit(form.id)}>
-            <IconPencil size={16} />
-          </ActionIcon>
-          <ActionIcon variant="subtle" color="red" onClick={() => handleDelete(form.id)}>
-            <IconTrash size={16} />
-          </ActionIcon>
+          <Tooltip label="Edit Form">
+            <ActionIcon variant="subtle" color="blue" onClick={() => handleEdit(form.id)}>
+              <IconPencil size={16} />
+            </ActionIcon>
+          </Tooltip>
+          <Tooltip label="Delete Form">
+            {/* 4. Update onClick to trigger the modal */}
+            <ActionIcon variant="subtle" color="red" onClick={() => openDeleteModal(form)}>
+              <IconTrash size={16} />
+            </ActionIcon>
+          </Tooltip>
         </Group>
       </Table.Td>
     </Table.Tr>
@@ -74,7 +104,7 @@ export function JotformManagement() {
 
   const handleCloseCreateModal = () => {
     setCreateJotformModalOpened(false);
-    fetchJotforms();
+    fetchJotforms(); // Refresh list after creating a new form
   };
 
   return (
@@ -116,11 +146,12 @@ export function JotformManagement() {
 
       <Modal
         opened={createJotformModalOpened}
-        onClose={handleCloseCreateModal}
+        onClose={() => setCreateJotformModalOpened(false)} // Close without re-fetching
         title="Create New Jotform"
         centered
       >
-        <CreateJotform />
+        {/* Pass the success handler to the CreateJotform component */}
+        <CreateJotform onSuccess={handleCloseCreateModal} />
       </Modal>
     </Container>
   );
