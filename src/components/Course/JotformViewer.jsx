@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Loader, Text, Box } from "@mantine/core";
 import axios from "axios";
-import RenderJotform from "./RenderJotform";
+// Corrected import to match the new file name "RenderJotForm.jsx"
+import RenderJotform from "./RenderJotForm.jsx"; 
 
 export function JotformViewer({ jotformName, onBack }) {
   const [formData, setFormData] = useState(null);
@@ -9,14 +10,16 @@ export function JotformViewer({ jotformName, onBack }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!jotformName) return;
+    if (!jotformName) {
+        setLoading(false);
+        setError("No Jotform name provided.");
+        return;
+    };
 
     const fetchJotform = async () => {
       setLoading(true);
       setError(null);
       try {
-        // Assuming your backend can find a jotform by its name.
-        // If not, you may need an endpoint like /api/jotforms/name/{name}
         const response = await axios.get(`http://localhost:8081/api/jotforms`);
         const foundForm = response.data.find(form => form.jotformName === jotformName);
         
@@ -27,8 +30,8 @@ export function JotformViewer({ jotformName, onBack }) {
         }
 
       } catch (err) {
-        setError("Failed to load the form. Please try again.");
-        console.error(err);
+        setError("Failed to load the form. Please check the network connection and try again.");
+        console.error("Fetch Jotform Error:", err);
       } finally {
         setLoading(false);
       }
@@ -54,9 +57,9 @@ export function JotformViewer({ jotformName, onBack }) {
       </button>
 
       {loading && (
-        <Box ta="center">
+        <Box ta="center" mt="xl">
           <Loader />
-          <Text>Loading Form...</Text>
+          <Text mt="md">Loading Form...</Text>
         </Box>
       )}
 
