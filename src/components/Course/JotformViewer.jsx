@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Loader, Text, Box } from "@mantine/core";
 import axios from "axios";
-// Corrected import to match the new file name "RenderJotForm.jsx"
-import RenderJotform from "./RenderJotForm.jsx"; 
+// The import statement now exactly matches the file name "RenderJotForm.jsx"
+import RenderJotform from "./RenderJotForm.jsx";
 
 export function JotformViewer({ jotformName, onBack }) {
   const [formData, setFormData] = useState(null);
@@ -10,16 +10,20 @@ export function JotformViewer({ jotformName, onBack }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    // Exit early if no jotformName is provided
     if (!jotformName) {
-        setLoading(false);
-        setError("No Jotform name provided.");
-        return;
-    };
+      setLoading(false);
+      setError("No Jotform name provided.");
+      return;
+    }
 
     const fetchJotform = async () => {
       setLoading(true);
       setError(null);
       try {
+        // Fetches all forms, then finds the correct one by name.
+        // For better performance, consider creating a specific backend endpoint
+        // like GET /api/jotforms/by-name/{jotformName}
         const response = await axios.get(`http://localhost:8081/api/jotforms`);
         const foundForm = response.data.find(form => form.jotformName === jotformName);
         
@@ -38,7 +42,7 @@ export function JotformViewer({ jotformName, onBack }) {
     };
 
     fetchJotform();
-  }, [jotformName]);
+  }, [jotformName]); // This effect runs whenever the jotformName changes
 
   return (
     <Box p="xl">
@@ -56,6 +60,7 @@ export function JotformViewer({ jotformName, onBack }) {
         ⬅ Back to Courses
       </button>
 
+      {/* Display loading indicator */}
       {loading && (
         <Box ta="center" mt="xl">
           <Loader />
@@ -63,8 +68,10 @@ export function JotformViewer({ jotformName, onBack }) {
         </Box>
       )}
 
+      {/* Display error message if something went wrong */}
       {error && <Text color="red" ta="center">{error}</Text>}
 
+      {/* Render the form if data is available and not loading */}
       {formData && !loading && <RenderJotform formData={formData} />}
     </Box>
   );

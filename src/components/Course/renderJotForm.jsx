@@ -1,21 +1,10 @@
-// RenderJotform.jsx
 import React, { useState } from "react";
 import { Box, Text, Divider, Image, Group, Button } from "@mantine/core";
 
+// This is a helper component to render a single element based on its tagName
 function RenderElement({ element }) {
-  // ✅ Extract common props
-  const {
-    content,
-    tagName,
-    align,
-    width,
-    height,
-    required,
-    style = {},
-    placeholder,
-  } = element;
+  const { content, tagName, align, width, height, required, style = {}, placeholder } = element;
 
-  // ✅ Shared styles
   const baseStyle = {
     textAlign: align || "left",
     width: width || "auto",
@@ -26,12 +15,7 @@ function RenderElement({ element }) {
   switch (tagName) {
     case "heading":
       return (
-        <Text
-          fw={700}
-          size={element.size || "xl"}
-          mb="md"
-          style={baseStyle}
-        >
+        <Text fw={700} size={element.size || "xl"} mb="md" style={baseStyle}>
           {content}
           {required && <span style={{ color: "red" }}> *</span>}
         </Text>
@@ -55,9 +39,7 @@ function RenderElement({ element }) {
             fit="contain"
           />
           {typeof content === "object" && (
-            <Text size="xs" mt={4} c="dimmed">
-              {content.fileName}
-            </Text>
+            <Text size="xs" mt={4} c="dimmed">{content.fileName}</Text>
           )}
         </Box>
       );
@@ -65,11 +47,7 @@ function RenderElement({ element }) {
     case "video":
       return (
         <Box mb="md" style={baseStyle}>
-          <video
-            width={width || "100%"}
-            height={height || "auto"}
-            controls
-          >
+          <video width={width || "100%"} height={height || "auto"} controls>
             <source src={content} type="video/mp4" />
             Your browser does not support the video tag.
           </video>
@@ -110,13 +88,12 @@ function RenderElement({ element }) {
 
     default:
       return (
-        <Text style={baseStyle}>
-          {content}
-        </Text>
+        <Text style={baseStyle}>{content}</Text>
       );
   }
 }
 
+// The main component that renders the entire form with pagination
 export default function RenderJotform({ formData }) {
   const [pageIndex, setPageIndex] = useState(0);
   const page = formData.pages[pageIndex];
@@ -132,19 +109,18 @@ export default function RenderJotform({ formData }) {
         boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
       }}
     >
-      {/* Title */}
-      <Text fw={800} size="xl" align="center" mb="xl">
+      <Text fw={800} size="xl" ta="center" mb="xl">
         {formData.jotformName}
       </Text>
 
-      {/* Render Elements */}
+      {/* Render all elements on the current page, sorted by sequence */}
       {page.elements
         .sort((a, b) => a.sequence - b.sequence)
         .map((element) => (
           <RenderElement key={element.id} element={element} />
         ))}
 
-      {/* Navigation */}
+      {/* Page navigation buttons */}
       <Group justify="center" mt="xl">
         <Button
           disabled={pageIndex === 0}
