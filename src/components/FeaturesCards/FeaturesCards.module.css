@@ -15,6 +15,7 @@
   margin: auto;
 }
 
+
 .description::after {
   content: '';
   display: block;

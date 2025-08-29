@@ -67,6 +67,7 @@ export function FeaturesCards() {
         Discover powerful features for admin management, user engagement, and insightful analytics in your pharmaceutical training platform.
       </Text>
 
+
       <SimpleGrid cols={{ base: 1, md: 3 }} spacing="xl" mt={50}>
         {features}
       </SimpleGrid>
