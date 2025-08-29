@@ -1,47 +1,55 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Table, Text, Title, Loader } from '@mantine/core';
-import axios from 'axios';
-import { JotformViewer } from './JotformViewer';
+import React, { useState } from "react";
+import { Container, Title, Button, Group, Text } from "@mantine/core";
+import { JotformViewer } from "./JotformViewer";
+import { CourseTable } from "./CourseTable";
+import { CourseGrid } from "./CourseGrid";
 
 export function Course() {
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [view, setView] = useState('list');
-  const [selectedJotform, setSelectedJotform] = useState(null);
-  const group = 'BL';
+  // ✅ Static dummy data
+  const dummyCourses = [
+    {
+      courseId: 1,
+      courseName: "Pharma Compliance Basics",
+      learningJotformName: "Pharma Learning Form",
+      assignmentJotformName: "Pharma Assignment Form",
+      imageFileName: "mindmap1.png",
+    },
+    {
+      courseId: 2,
+      courseName: "Advanced Marketing Strategies",
+      learningJotformName: "Marketing Learning Form",
+      assignmentJotformName: "Marketing Assignment Form",
+      imageFileName: "mindmap2.png",
+    },
+    {
+      courseId: 3,
+      courseName: "Field Operations Training",
+      learningJotformName: "Field Ops Learning Form",
+      assignmentJotformName: "Field Ops Assignment Form",
+      imageFileName: "mindmap3.png",
+    },
+  ];
 
-  useEffect(() => {
-    if (view === 'list') {
-      const fetchCourses = async () => {
-        setLoading(true);
-        try {
-          const response = await axios.get(`http://localhost:8081/api/courses?group=${group}`);
-          setCourses(response.data);
-        } catch (error) {
-          console.error(`Error fetching courses for group ${group}:`, error);
-          setCourses([]);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchCourses();
-    }
-  }, [view]);
+  const [view, setView] = useState("list"); // "list" | "grid" | "viewer"
+  const [selectedJotform, setSelectedJotform] = useState(null);
+  const group = "BL";
 
   const handleViewJotform = (jotformName) => {
     if (jotformName) {
       setSelectedJotform(jotformName);
-      setView('viewer');
+      setView("viewer");
     }
   };
 
   const handleBackToList = () => {
-    setView('list');
+    setView("list");
     setSelectedJotform(null);
   };
 
-  if (view === 'viewer') {
-    return <JotformViewer jotformName={selectedJotform} onBack={handleBackToList} />;
+  if (view === "viewer") {
+    return (
+      <JotformViewer jotformName={selectedJotform} onBack={handleBackToList} />
+    );
   }
 
   return (
@@ -50,42 +58,34 @@ export function Course() {
         Course Management
       </Title>
 
-      {loading ? (
-        <Text ta="center" c="dimmed">
-          <Loader />
-        </Text>
-      ) : courses.length > 0 ? (
-        <Table highlightOnHover withTableBorder withColumnBorders>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>Course Name</Table.Th>
-              <Table.Th>Jotform Learning</Table.Th>
-              <Table.Th>Jotform Assignment</Table.Th>
-              <Table.Th>Mind Map</Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {/* FIX: Added a unique key to the Table.Tr element */}
-            {courses.map((course) => (
-              <Table.Tr key={course.courseId}>
-                <Table.Td>{course.courseName}</Table.Td>
-                <Table.Td
-                  onClick={() => handleViewJotform(course.learningJotformName)}
-                  style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
-                >
-                  {course.learningJotformName}
-                </Table.Td>
-                <Table.Td
-                  onClick={() => handleViewJotform(course.assignmentJotformName)}
-                  style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
-                >
-                  {course.assignmentJotformName}
-                </Table.Td>
-                <Table.Td>{course.imageFileName}</Table.Td>
-              </Table.Tr>
-            ))}
-          </Table.Tbody>
-        </Table>
+      <Group justify="center" mb="md">
+        <Button
+          variant={view === "list" ? "filled" : "light"}
+          onClick={() => setView("list")}
+        >
+          Table View
+        </Button>
+        <Button
+          variant={view === "grid" ? "filled" : "light"}
+          onClick={() => setView("grid")}
+        >
+          Grid View
+        </Button>
+      </Group>
+
+      {dummyCourses.length > 0 ? (
+        view === "list" ? (
+          <CourseTable
+            courses={dummyCourses}
+            onViewJotform={handleViewJotform}
+          />
+        ) : (
+          <CourseGrid
+            courses={dummyCourses}
+            group={group}
+            onViewJotform={handleViewJotform}
+          />
+        )
       ) : (
         <Text ta="center" c="dimmed">
           No courses available for this group.
