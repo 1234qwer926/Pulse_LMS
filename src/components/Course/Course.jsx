@@ -1,38 +1,35 @@
-import React, { useState } from "react";
-import { Container, Title, Button, Group, Text } from "@mantine/core";
+import React, { useState, useEffect } from "react";
+import { Container, Title, Button, Group, Text, SegmentedControl, Loader } from "@mantine/core";
+import axios from "axios";
 import { JotformViewer } from "./JotformViewer";
 import { CourseTable } from "./CourseTable";
 import { CourseGrid } from "./CourseGrid";
 
 export function Course() {
-  // ✅ Static dummy data
-  const dummyCourses = [
-    {
-      courseId: 1,
-      courseName: "Pharma Compliance Basics",
-      learningJotformName: "Pharma Learning Form",
-      assignmentJotformName: "Pharma Assignment Form",
-      imageFileName: "mindmap1.png",
-    },
-    {
-      courseId: 2,
-      courseName: "Advanced Marketing Strategies",
-      learningJotformName: "Marketing Learning Form",
-      assignmentJotformName: "Marketing Assignment Form",
-      imageFileName: "mindmap2.png",
-    },
-    {
-      courseId: 3,
-      courseName: "Field Operations Training",
-      learningJotformName: "Field Ops Learning Form",
-      assignmentJotformName: "Field Ops Assignment Form",
-      imageFileName: "mindmap3.png",
-    },
-  ];
-
+  const [courses, setCourses] = useState([]);
   const [view, setView] = useState("list"); // "list" | "grid" | "viewer"
   const [selectedJotform, setSelectedJotform] = useState(null);
-  const group = "BL";
+  const [selectedGroup, setSelectedGroup] = useState("BL"); // Default group
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await axios.get(`http://localhost:8081/api/courses?group=${selectedGroup}`);
+        setCourses(response.data);
+      } catch (err) {
+        setError("Failed to fetch courses. Please try again later.");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourses();
+  }, [selectedGroup]); // Refetch when the group changes
 
   const handleViewJotform = (jotformName) => {
     if (jotformName) {
@@ -55,8 +52,20 @@ export function Course() {
   return (
     <Container size="lg" py="xl">
       <Title order={2} ta="center" mb="md">
-        Course Management
+        Course Catalog
       </Title>
+
+      <Group justify="center" mb="xl">
+        <SegmentedControl
+          value={selectedGroup}
+          onChange={setSelectedGroup}
+          data={[
+            { label: "BL", value: "BL" },
+            { label: "BE", value: "BE" },
+            { label: "BM", value: "BM" },
+          ]}
+        />
+      </Group>
 
       <Group justify="center" mb="md">
         <Button
@@ -73,22 +82,26 @@ export function Course() {
         </Button>
       </Group>
 
-      {dummyCourses.length > 0 ? (
+      {loading ? (
+        <Group justify="center">
+            <Loader />
+            <Text>Loading courses...</Text>
+        </Group>
+      ) : error ? (
+        <Text ta="center" c="red">{error}</Text>
+      ) : courses.length > 0 ? (
         view === "list" ? (
-          <CourseTable
-            courses={dummyCourses}
-            onViewJotform={handleViewJotform}
-          />
+          <CourseTable courses={courses} onViewJotform={handleViewJotform} />
         ) : (
           <CourseGrid
-            courses={dummyCourses}
-            group={group}
+            courses={courses}
+            group={selectedGroup}
             onViewJotform={handleViewJotform}
           />
         )
       ) : (
         <Text ta="center" c="dimmed">
-          No courses available for this group.
+          No courses available for the '{selectedGroup}' group.
         </Text>
       )}
     </Container>
