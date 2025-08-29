@@ -13,7 +13,8 @@ import { Link } from 'react-router-dom';
 
 export function LmsDashboard() {
   return (
-    <Box style={{ background: 'var(--mantine-color-dark-8)', padding: '32px 0' }}>
+    // background: 'var(--mantine-color-dark-8)',
+    <Box style={{  padding: '32px 0' }}>
       <Container size="lg">
         <Title align="center" order={1} style={{ color: 'var(--mantine-color-white)', marginBottom: 24 }}>
           PULSE LMS Dashboard
@@ -27,7 +28,7 @@ export function LmsDashboard() {
               radius="md"
               p="lg"
               style={{
-                background: 'var(--mantine-color-dark-7)',
+                // background: 'var(--mantine-color-dark-7)',
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
@@ -52,7 +53,7 @@ export function LmsDashboard() {
               radius="md"
               p="lg"
               style={{
-                background: 'var(--mantine-color-dark-7)',
+                // background: 'var(--mantine-color-dark-7)',
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
@@ -78,7 +79,7 @@ export function LmsDashboard() {
               radius="md"
               p="lg"
               style={{
-                background: 'var(--mantine-color-dark-7)',
+                // background: 'var(--mantine-color-dark-7)',
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
@@ -103,7 +104,7 @@ export function LmsDashboard() {
               radius="md"
               p="lg"
               style={{
-                background: 'var(--mantine-color-dark-7)',
+                // background: 'var(--mantine-color-dark-7)',
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',

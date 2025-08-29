@@ -4,42 +4,34 @@ import { IconPencil, IconDeviceFloppy } from '@tabler/icons-react';
 import { useParams, useLocation } from 'react-router-dom';
 import axios from 'axios';
 
-// Mock data for a user's assignment
-const mockAssignmentDetails = [
-  { id: 1, question: 'What is React?', userAnswer: 'A library for building user interfaces.', contentLink: 'react-docs.html', gptScore: 8, finalScore: 8, editing: false },
-  { id: 2, question: 'Explain the virtual DOM.', userAnswer: 'A virtual copy of the UI.', contentLink: 'vdom-explained.html', gptScore: 9, finalScore: 9, editing: false },
-  { id: 3, question: 'What are hooks?', userAnswer: 'Functions that let you use state and other React features.', contentLink: 'hooks-intro.html', gptScore: 7, finalScore: 7, editing: false },
-];
-
 export function AssignmentReview() {
   const { courseId, userId } = useParams();
   const location = useLocation();
   const { username } = location.state || { username: 'User' };
-
   const [assignment, setAssignment] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const fetchAssignmentDetails = async () => {
-    setLoading(true);
-    try {
-      // Replace with your actual API endpoint
-      // const response = await axios.get(`http://localhost:8081/api/assignment/${courseId}/${userId}`);
-      // const dataWithEditingState = response.data.map(item => ({ ...item, editing: false, tempScore: item.finalScore }));
-      // setAssignment(dataWithEditingState);
-      
-      // Using mock data for this example
-      setAssignment(mockAssignmentDetails.map(item => ({ ...item, tempScore: item.finalScore })));
-
-    } catch (error) {
-      console.error('Error fetching assignment details:', error);
-      setAssignment([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchAssignmentDetails();
+    const fetchAssignmentDetails = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get(`http://localhost:8081/api/assignment/${courseId}/${userId}`);
+        const dataWithEditingState = response.data.map(item => ({
+          ...item,
+          editing: false,
+          tempScore: item.finalScore
+        }));
+        setAssignment(dataWithEditingState);
+      } catch (error) {
+        console.error('Error fetching assignment details:', error);
+        setAssignment([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (courseId && userId) {
+      fetchAssignmentDetails();
+    }
   }, [courseId, userId]);
 
   const handleEditToggle = (id) => {
@@ -49,21 +41,23 @@ export function AssignmentReview() {
   };
   
   const handleScoreChange = (id, value) => {
-      setAssignment(assignment.map(item =>
-          item.id === id ? { ...item, tempScore: value } : item
-      ));
+    setAssignment(assignment.map(item =>
+      item.id === id ? { ...item, tempScore: value } : item
+    ));
   };
 
   const handleSaveScore = async (id) => {
     const itemToSave = assignment.find(item => item.id === id);
     if (!itemToSave) return;
     
-    // In a real application, you would save the score via an API call
-    // await axios.put(`http://localhost:8081/api/assignment/score/${id}`, { finalScore: itemToSave.tempScore });
-
-    setAssignment(assignment.map(item =>
-      item.id === id ? { ...item, finalScore: itemToSave.tempScore, editing: false } : item
-    ));
+    try {
+      await axios.put(`http://localhost:8081/api/assignment/score/${id}`, { finalScore: itemToSave.tempScore });
+      setAssignment(assignment.map(item =>
+        item.id === id ? { ...item, finalScore: itemToSave.tempScore, editing: false } : item
+      ));
+    } catch (error) {
+      console.error('Error updating score:', error);
+    }
   };
   
   const totalFinalScore = assignment.reduce((acc, curr) => acc + curr.finalScore, 0);
@@ -71,12 +65,10 @@ export function AssignmentReview() {
   return (
     <Container size="xl" py="xl">
       <Group justify="space-between" mb="xl">
-        <Title order={3}>Assignment Review</Title>
-        <Text fw={500}>User: {username}</Text>
+        <Title order={3}>Assignment Review for: {username}</Title>
       </Group>
-
       {loading ? (
-        <Text>Loading...</Text>
+        <Text>Loading assignment details...</Text>
       ) : (
         <Table withTableBorder withColumnBorders>
           <Table.Thead>
@@ -95,9 +87,7 @@ export function AssignmentReview() {
                 <Table.Td>{item.question}</Table.Td>
                 <Table.Td>{item.userAnswer}</Table.Td>
                 <Table.Td>
-                    <a href={item.contentLink} target="_blank" rel="noopener noreferrer">
-                        View Content
-                    </a>
+                  <a href={item.contentLink} target="_blank" rel="noopener noreferrer">View Content</a>
                 </Table.Td>
                 <Table.Td>{item.gptScore}</Table.Td>
                 <Table.Td>
@@ -106,9 +96,9 @@ export function AssignmentReview() {
                       value={item.tempScore}
                       onChange={(value) => handleScoreChange(item.id, value)}
                       min={0}
-                      max={10}
+                      max={100} // Assuming max score is 100
                       size="xs"
-                      style={{ width: 70 }}
+                      style={{ width: 80 }}
                     />
                   ) : (
                     item.finalScore
@@ -116,13 +106,13 @@ export function AssignmentReview() {
                 </Table.Td>
                 <Table.Td>
                   {item.editing ? (
-                      <ActionIcon variant="subtle" color="green" onClick={() => handleSaveScore(item.id)}>
-                          <IconDeviceFloppy size={18} />
-                      </ActionIcon>
+                    <ActionIcon variant="subtle" color="green" onClick={() => handleSaveScore(item.id)}>
+                      <IconDeviceFloppy size={18} />
+                    </ActionIcon>
                   ) : (
-                      <ActionIcon variant="subtle" color="blue" onClick={() => handleEditToggle(item.id)}>
-                          <IconPencil size={18} />
-                      </ActionIcon>
+                    <ActionIcon variant="subtle" color="blue" onClick={() => handleEditToggle(item.id)}>
+                      <IconPencil size={18} />
+                    </ActionIcon>
                   )}
                 </Table.Td>
               </Table.Tr>
@@ -130,7 +120,7 @@ export function AssignmentReview() {
           </Table.Tbody>
           <Table.Tfoot>
             <Table.Tr>
-              <Table.Td colSpan={4} style={{ textAlign: 'right', fontWeight: 'bold' }}>Total Final Score</Table.Td>
+              <Table.Td colSpan={4} style={{ textAlign: 'right', fontWeight: 'bold' }}>Total Score</Table.Td>
               <Table.Td style={{ fontWeight: 'bold' }}>{totalFinalScore}</Table.Td>
               <Table.Td />
             </Table.Tr>
