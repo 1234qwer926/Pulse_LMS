@@ -97,7 +97,7 @@ export function LmsDashboard() {
           </Link>
 
           {/* Card 4: Results Management */}
-          <Link to="/resultsmanagement" style={{ textDecoration: 'none', height: '100%' }}>
+          <Link to="/resultmanagement" style={{ textDecoration: 'none', height: '100%' }}>
             <Card
               shadow="md"
               radius="md"

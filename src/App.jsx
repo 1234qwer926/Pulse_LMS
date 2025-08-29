@@ -1,10 +1,8 @@
-import { useState } from 'react'
+import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { HeaderMegaMenu } from './components/HeaderMegaMenu/HeaderMegaMenu'
-import { FeaturesCards } from './components/FeaturesCards/FeaturesCards'
-import { HeroText } from './components/HeroText/HeroText'
-import { FooterLinks } from './components/FooterLinks/FooterLinks'
-import { AuthenticationForm } from './components/AuthenticationForm/AuthenticationForm'
+import { HeaderMegaMenu } from './components/HeaderMegaMenu/HeaderMegaMenu';
+import { FooterLinks } from './components/FooterLinks/FooterLinks';
+import { AuthenticationForm } from './components/AuthenticationForm/AuthenticationForm';
 import Home from './components/Home/Home';
 import { UserMapping } from './components/LmsDashboard/UserMapping';
 import { LmsDashboard } from './components/LmsDashboard/LmsDashboard';
@@ -17,21 +15,23 @@ import { Course } from './components/Course/Course';
 import { JotformViewer } from './components/Course/JotformViewer';
 import { JotformManagement } from './components/LmsDashboard/JotformManagement';
 import { UserManagement } from './components/LmsDashboard/UserManagement';
-import './App.css'
+
+// Import the new result management components
+import { ResultManagement } from './components/LmsDashboard/ResultManagement';
+import { UserResults } from './components/LmsDashboard/UserResults';
+import { AssignmentReview } from './components/LmsDashboard/AssignmentReview';
+
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(0);
 
   return (
-
-      <div>
-      {/* <ToastContainer position="top-right" autoClose={3000} /> */}
-      
-      
-      {/* <HeroTitle/> */}
+    <div>
       <Router>
         <HeaderMegaMenu />
         <Routes>
+          {/* Existing Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<AuthenticationForm />} />
           <Route path="/mapuser" element={<UserMapping />} />
@@ -45,12 +45,16 @@ function App() {
           <Route path="/jotformviewer" element={<JotformViewer />} />
           <Route path="/jotformmanagment" element={<JotformManagement />} />
           <Route path="/usermanagment" element={<UserManagement />} />
+
+          {/* New Routes for Result Management */}
+          <Route path="/resultmanagement" element={<ResultManagement />} />
+          <Route path="/user-results/:courseId" element={<UserResults />} />
+          <Route path="/assignment-review/:courseId/:userId" element={<AssignmentReview />} />
         </Routes>
-        <FooterLinks/>
+        <FooterLinks />
       </Router>
     </div>
-
-  )
+  );
 }
 
-export default App
+export default App;
