@@ -5,6 +5,7 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { IconTypography, IconTextSize, IconArrowsVertical, IconLineDashed, IconMusic, IconVideo, IconClock, IconListNumbers, IconList, IconSettings, IconEye, IconTrash, IconUpload, IconPhoto, IconBrain, IconLink } from '@tabler/icons-react';
 import { useLocation } from 'react-router-dom';
 import { notifications } from '@mantine/notifications';
+import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 
 const FORM_ELEMENTS = [
@@ -580,6 +581,7 @@ function PropertiesPanel({ selectedElement, onPropertyChange, onClose }) {
 
 export function CreateJotformBuilder() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [jotformName, setJotformName] = useState("New Jotform");
   const [pages, setPages] = useState([[]]);
   const [currentPage, setCurrentPage] = useState(0);
@@ -596,7 +598,7 @@ export function CreateJotformBuilder() {
 
   const onDragEnd = (result) => {
     const { source, destination } = result;
-    if (!destination) return;
+    if (!destination) return; 
     
     if (source.droppableId === 'elements' && destination.droppableId === 'canvas') {
       const newElem = { ...FORM_ELEMENTS[source.index], content: '', id: Date.now() };
@@ -763,6 +765,7 @@ export function CreateJotformBuilder() {
       
       console.log('✅ Saved to database:', response.data);
       console.log(fullData);
+      navigate("/jotformmanagment");  
     } catch (error) {
       console.error('❌ Failed to save learning material:', error);
       notifications.show({
