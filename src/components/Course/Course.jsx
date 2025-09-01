@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { Container, Title, Button, Group, Text, SegmentedControl, Loader } from "@mantine/core";
+import { Container, Title, Group, Text, SegmentedControl, Loader, SimpleGrid } from "@mantine/core";
 import axios from "axios";
-import { JotformViewer } from "./JotformViewer";
-import { CourseTable } from "./CourseTable";
-import { CourseGrid } from "./CourseGrid";
+import { CourseDetail } from "./CourseDetail";
+import { CourseCard } from "./CourseCard";
 
 export function Course() {
   const [courses, setCourses] = useState([]);
-  const [view, setView] = useState("list"); // "list" | "grid" | "viewer"
-  const [selectedJotform, setSelectedJotform] = useState(null);
-  const [selectedGroup, setSelectedGroup] = useState("BL"); // Default group
+  const [selectedGroup, setSelectedGroup] = useState("BL");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedCourse, setSelectedCourse] = useState(null);
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -29,28 +27,29 @@ export function Course() {
     };
 
     fetchCourses();
-  }, [selectedGroup]); // Refetch when the group changes
+  }, [selectedGroup]);
 
-  const handleViewJotform = (jotformName) => {
-    if (jotformName) {
-      setSelectedJotform(jotformName);
-      setView("viewer");
-    }
+  const handleSelectCourse = (course) => {
+    setSelectedCourse(course);
   };
 
-  const handleBackToList = () => {
-    setView("list");
-    setSelectedJotform(null);
+  const handleBackToCourses = () => {
+    setSelectedCourse(null);
   };
 
-  if (view === "viewer") {
+  // Show CourseDetail component when a course is selected
+  if (selectedCourse) {
     return (
-      <JotformViewer jotformName={selectedJotform} onBack={handleBackToList} />
+      <CourseDetail 
+        course={selectedCourse} 
+        onBack={handleBackToCourses} 
+      />
     );
   }
 
+  // Main course list view
   return (
-    <Container size="lg" py="xl">
+    <Container size="xl" py="xl">
       <Title order={2} ta="center" mb="md">
         Course Catalog
       </Title>
@@ -67,38 +66,26 @@ export function Course() {
         />
       </Group>
 
-      <Group justify="center" mb="md">
-        <Button
-          variant={view === "list" ? "filled" : "light"}
-          onClick={() => setView("list")}
-        >
-          Table View
-        </Button>
-        <Button
-          variant={view === "grid" ? "filled" : "light"}
-          onClick={() => setView("grid")}
-        >
-          Grid View
-        </Button>
-      </Group>
-
       {loading ? (
         <Group justify="center">
-            <Loader />
-            <Text>Loading courses...</Text>
+          <Loader />
+          <Text>Loading courses...</Text>
         </Group>
       ) : error ? (
         <Text ta="center" c="red">{error}</Text>
       ) : courses.length > 0 ? (
-        view === "list" ? (
-          <CourseTable courses={courses} onViewJotform={handleViewJotform} />
-        ) : (
-          <CourseGrid
-            courses={courses}
-            group={selectedGroup}
-            onViewJotform={handleViewJotform}
-          />
-        )
+        <SimpleGrid 
+          cols={{ base: 1, sm: 2, md: 3, lg: 4 }} 
+          spacing="lg"
+        >
+          {courses.map((course) => (
+            <CourseCard
+              key={course.id}
+              course={course}
+              onSelectCourse={handleSelectCourse}
+            />
+          ))}
+        </SimpleGrid>
       ) : (
         <Text ta="center" c="dimmed">
           No courses available for the '{selectedGroup}' group.

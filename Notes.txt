@@ -84,3 +84,63 @@ Azure Ai Foundary:
    - 3. Training:
      - All personnel who use, maintain, or develop the system must be adequately trained, and this training must be documented.
      - Real-World Application: A new engineer completes vendor-provided training, internal role-based training, and a review of the company's policies. This training is formally documented in their employee record as proof of qualification.
+
+
+
+
+Changes :
+
+Back navigation Icon and its functionality
+Home Should have anchor tag
+
+In Navigation course should not have the groups
+course Content for user should be have like the article cards from the manatine ui----Done
+
+Learning view material should have the complete button 
+content in learning material should have should be formated correctly and also need the allignments data from the backend
+
+make api calls accordingly to the group insted of getting the enterprises groups data 
+Get the data for the Analytic Dashboard
+
+In Jotform Builder i also need a option to remove pages 
+Naviagation required when we click on the map assignment form in the course mangment
+
+
+Responsive ui:
+
+features in the nav hamburger aligned to the left
+paragraph under the key features of the pulse lms in the home page
+tables are overfolwing from the screen width
+
+Main Functions:
+
+Frontend :
+Assignment ui should have the instructions and the video recording for the jotform
+
+Backend:
+The Assignment and learning post data will be get updated in the results tab
+update the security functions :
+                                Authorization
+                                authentication
+                                Ratelimitting
+                                cors
+                                Sql injection
+                                firewalls
+                                csrf
+                                xss
+
+
+
+
+End points :
+Admindashboard:
+
+jotform : put request
+course : put request
+usermap: put request
+
+userdashboard:
+
+jotform: post request for learning and Assignment
+
+

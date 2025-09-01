@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Paper, Box, Button, TextInput, Group, Text, Divider, ThemeIcon, Stack, Select, NumberInput, Tooltip, ActionIcon, Textarea, FileInput, ScrollArea } from '@mantine/core';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { IconTypography, IconTextSize, IconArrowsVertical, IconLineDashed, IconMusic, IconVideo, IconClock, IconListNumbers, IconList, IconSettings, IconEye, IconTrash, IconUpload, IconPhoto, IconBrain, IconLink } from '@tabler/icons-react';
+import { IconTypography, IconTextSize, IconArrowsVertical, IconLineDashed, IconMusic, IconVideo, IconClock, IconListNumbers, IconList, IconSettings, IconEye, IconTrash, IconUpload, IconPhoto, IconBrain, IconLink, IconNumbers, IconVideoPlus, IconMicrophone } from '@tabler/icons-react';
 import { useLocation } from 'react-router-dom';
 import { notifications } from '@mantine/notifications';
 import { useNavigate } from "react-router-dom";
@@ -19,6 +19,9 @@ const FORM_ELEMENTS = [
   { type: 'timer', label: 'Timer', icon: IconClock },
   { type: 'orderedlist', label: 'Ordered List', icon: IconListNumbers },
   { type: 'unorderedlist', label: 'Unordered List', icon: IconList },
+  { type: 'randominteger', label: 'Random Integer', icon: IconNumbers },
+  { type: 'videorecording', label: 'Video Recording', icon: IconVideoPlus }, // New element added
+  { type: 'audiorecording', label: 'Audio Recording', icon: IconMicrophone }, // New element added
 ];
 
 function Timer({ element, onTimeUpdate }) {
@@ -92,7 +95,7 @@ function getElementComponent(element, onEdit, isSelected, onDelete, onShowProper
       }}
     >
       {children}
-      {/* Action buttons */}
+      {/* Action buttons - Only show delete for recording elements, no properties */}
       <Box
         className="element-actions"
         style={{
@@ -107,19 +110,21 @@ function getElementComponent(element, onEdit, isSelected, onDelete, onShowProper
         }}
       >
         <Group spacing={4}>
-          <Tooltip label="Properties" position="top">
-            <ActionIcon
-              size="sm"
-              variant="subtle"
-              color="white"
-              onClick={(e) => {
-                e.stopPropagation();
-                onShowProperties();
-              }}
-            >
-              <IconSettings size={14} />
-            </ActionIcon>
-          </Tooltip>
+          {!['videorecording', 'audiorecording'].includes(element.type) && (
+            <Tooltip label="Properties" position="top">
+              <ActionIcon
+                size="sm"
+                variant="subtle"
+                color="white"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onShowProperties();
+                }}
+              >
+                <IconSettings size={14} />
+              </ActionIcon>
+            </Tooltip>
+          )}
           <Tooltip label="Delete" position="top">
             <ActionIcon
               size="sm"
@@ -339,6 +344,65 @@ function getElementComponent(element, onEdit, isSelected, onDelete, onShowProper
           </ul>
         </ElementWrapper>
       );
+    case 'randominteger':
+      return (
+        <ElementWrapper>
+          <Box style={{ 
+            textAlign: element.align || 'left',
+            padding: '12px',
+            border: '1px solid #e0e0e0',
+            borderRadius: '6px',
+            backgroundColor: '#f8f9fa'
+          }} onClick={onEdit}>
+            <Text fw={500} size="sm" mb={8} color="#333">Random Integer</Text>
+            <Text size="lg" fw={700} style={{ 
+              fontFamily: 'monospace',
+              color: element.content ? '#007CFF' : '#999'
+            }}>
+              {element.content || 'Click to set number'}
+            </Text>
+            <Text size="xs" color="dimmed" mt={4}>
+              Integer value: {element.content || 'Not set'}
+            </Text>
+          </Box>
+        </ElementWrapper>
+      );
+    case 'videorecording':
+      return (
+        <ElementWrapper>
+          <Box style={{ 
+            textAlign: 'center',
+            padding: '20px',
+            border: '2px dashed #ff6b35',
+            borderRadius: '8px',
+            backgroundColor: '#fff5f0'
+          }}>
+            <IconVideoPlus size={48} color="#ff6b35" style={{ marginBottom: 8 }} />
+            <Text fw={600} size="md" color="#ff6b35" mb={4}>Video Recording</Text>
+            <Text size="sm" color="dimmed">
+              Users will be able to record video here
+            </Text>
+          </Box>
+        </ElementWrapper>
+      );
+    case 'audiorecording':
+      return (
+        <ElementWrapper>
+          <Box style={{ 
+            textAlign: 'center',
+            padding: '20px',
+            border: '2px dashed #007CFF',
+            borderRadius: '8px',
+            backgroundColor: '#f0f7ff'
+          }}>
+            <IconMicrophone size={48} color="#007CFF" style={{ marginBottom: 8 }} />
+            <Text fw={600} size="md" color="#007CFF" mb={4}>Audio Recording</Text>
+            <Text size="sm" color="dimmed">
+              Users will be able to record audio here
+            </Text>
+          </Box>
+        </ElementWrapper>
+      );
     default:
       return <span />;
   }
@@ -360,6 +424,17 @@ function PropertiesPanel({ selectedElement, onPropertyChange, onClose }) {
       <Box style={{ width: 300, background: '#2c2c2c', color: '#fff', padding: 20, height: '100%' }}>
         <Text size="lg" fw={600} mb="md">Properties</Text>
         <Text color="dimmed">Select an element to edit its properties</Text>
+      </Box>
+    );
+  }
+
+  // Don't show properties panel for recording elements
+  if (['videorecording', 'audiorecording'].includes(selectedElement.type)) {
+    return (
+      <Box style={{ width: 300, background: '#2c2c2c', color: '#fff', padding: 20, height: '100%' }}>
+        <Text size="lg" fw={600} mb="md">Recording Element</Text>
+        <Text color="dimmed">Recording elements don't have configurable properties. The recording functionality will be handled in the user dashboard.</Text>
+        <Button size="xs" variant="subtle" onClick={onClose} mt="md">Close</Button>
       </Box>
     );
   }
@@ -397,6 +472,7 @@ function PropertiesPanel({ selectedElement, onPropertyChange, onClose }) {
       case 'timer': return 'Timer Properties';
       case 'orderedlist': return 'Ordered List Properties';
       case 'unorderedlist': return 'Unordered List Properties';
+      case 'randominteger': return 'Random Integer Properties';
       default: return 'Element Properties';
     }
   };
@@ -433,6 +509,25 @@ function PropertiesPanel({ selectedElement, onPropertyChange, onClose }) {
                   placeholder="Enter paragraph text"
                   rows={6}
                 />
+              </Box>
+            )}
+
+            {/* Content/Number editing for random integer */}
+            {(['randominteger'].includes(selectedElement.type)) && (
+              <Box>
+                <Text size="sm" mb={4}>Integer Value</Text>
+                <NumberInput
+                  value={parseInt(selectedElement.content) || ''}
+                  onChange={(value) => onPropertyChange('content', value ? value.toString() : '')}
+                  placeholder="Enter an integer number"
+                  min={-999999}
+                  max={999999}
+                  stepHoldDelay={500}
+                  stepHoldInterval={100}
+                />
+                <Text size="xs" color="dimmed" mt={4}>
+                  Enter any integer number. This will be stored as: {selectedElement.content || 'empty'}
+                </Text>
               </Box>
             )}
 
@@ -621,7 +716,11 @@ export function CreateJotformBuilder() {
 
   const handleElementSelect = (idx) => {
     setSelectedElementIndex(idx);
-    setShowProperties(true);
+    const element = pages[currentPage][idx];
+    // Don't show properties panel for recording elements
+    if (!['videorecording', 'audiorecording'].includes(element.type)) {
+      setShowProperties(true);
+    }
   };
 
   const handleElementDelete = (idx) => {
@@ -677,6 +776,13 @@ export function CreateJotformBuilder() {
           case 'paragraph':
             content = element.content || `Default ${element.type} content`;
             break;
+          case 'randominteger':
+            content = element.content || '0'; // Store the integer as string
+            break;
+          case 'videorecording':
+          case 'audiorecording':
+            content = ''; // No content needed for recording elements
+            break;
           case 'image':
           case 'audio':
           case 'video':
@@ -715,7 +821,7 @@ export function CreateJotformBuilder() {
         return {
           id: element.id || `element_${pageIndex}_${elementIndex}`,
           tagName: element.type,
-          elementName: element.label || element.type,
+          elementName: element.type, // Same as tagName for recording elements
           content: content,
           sequence: elementIndex + 1,
           page: pageIndex + 1

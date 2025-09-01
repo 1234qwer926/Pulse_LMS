@@ -20,6 +20,8 @@ import { UserManagement } from './components/LmsDashboard/UserManagement';
 import { ResultManagement } from './components/LmsDashboard/ResultManagement';
 import { UserResults } from './components/LmsDashboard/UserResults';
 import { AssignmentReview } from './components/LmsDashboard/AssignmentReview';
+import { Assignment } from './components/Course/Assignment';
+import { JotformAssignment } from './components/Course/JotformAssignment';
 
 import './App.css';
 
@@ -50,6 +52,10 @@ function App() {
           <Route path="/resultmanagement" element={<ResultManagement />} />
           <Route path="/user-results/:courseId" element={<UserResults />} />
           <Route path="/assignment-review/:courseId/:userId" element={<AssignmentReview />} />
+          <Route path="/course/:courseId/assignment" element={<Assignment />} />
+        
+        {/* New assignment route */}
+        <Route path="/assignment/:jotformId" element={<JotformAssignment />} />
         </Routes>
         <FooterLinks />
       </Router>
