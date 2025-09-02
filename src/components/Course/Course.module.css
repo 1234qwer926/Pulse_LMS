@@ -43,15 +43,15 @@
 }
 
 .title {
-  color: var(--mantine-color-white);
+  color: var(--mantine-color-white) !important;
   margin-bottom: 5px;
 }
 
 .bodyText {
-  color: var(--mantine-color-dark-2);
+  color: white; /* ✅ Changed to white */
   margin-left: 4px;
 }
 
 .author {
-  color: var(--mantine-color-dark-2);
+  color: white !important;
 }
