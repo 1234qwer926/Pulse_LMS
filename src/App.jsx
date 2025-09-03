@@ -20,6 +20,7 @@ import { UserResults } from './components/LmsDashboard/UserResults';
 import { AssignmentReview } from './components/LmsDashboard/AssignmentReview';
 import { Assignment } from './components/Course/Assignment';
 import { JotformAssignment } from './components/Course/JotformAssignment';
+import FileUploadComponent from './components/FileUpload';
 
 import './App.css';
 
@@ -49,6 +50,7 @@ function App() {
           <Route path="/assignment-review/:courseId/:userId" element={<AssignmentReview />} />
           <Route path="/course/:courseId/assignment" element={<Assignment />} />
           <Route path="/assignment/:jotformId" element={<JotformAssignment />} />
+          <Route path="/fileupload" element={<FileUploadComponent />} />
         </Routes>
         <FooterLinks />
       </Router>

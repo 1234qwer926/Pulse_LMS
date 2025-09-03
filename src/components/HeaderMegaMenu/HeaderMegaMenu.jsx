@@ -162,45 +162,52 @@ export function HeaderMegaMenu() {
       </header>
 
       <Drawer
-        opened={drawerOpened}
-        onClose={closeDrawer}
-        size="100%"
-        padding="md"
-        title="Menu"
-        hiddenFrom="sm"
-        zIndex={1000000}
-        overlayColor={isDark ? theme.colors.dark[9] : theme.colors.gray[2]}
-      >
-        <ScrollArea h="calc(100vh - 80px)" mx="-md">
-          <Divider my="sm" />
+  opened={drawerOpened}
+  onClose={closeDrawer}
+  size="100%"
+  padding="md"
+  title="Menu"
+  hiddenFrom="sm"
+  zIndex={1000000}
+  overlayColor={isDark ? theme.colors.dark[9] : theme.colors.gray[2]}
+>
+  <ScrollArea h="calc(100vh - 80px)" mx="-md">
+    <Divider my="sm" />
 
-          <a href="#" className={classes.link}>
-            Home
-          </a>
-          <UnstyledButton className={classes.link} onClick={toggleLinks}>
-            <Center inline>
-              <Box component="span" mr={5}>
-                Features
-              </Box>
-              <IconChevronDown size={16} color={isDark ? theme.colors.blue[3] : theme.colors.blue[6]} />
-            </Center>
-          </UnstyledButton>
-          <Collapse in={linksOpened}>{links}</Collapse>
-          <a href="#" className={classes.link}>
-            Courses
-          </a>
-          <a href="#" className={classes.link}>
-            Analytics
-          </a>
+    <Link to="/" className={classes.link} onClick={closeDrawer}>
+      Home
+    </Link>
 
-          <Divider my="sm" />
+    <UnstyledButton className={classes.link} onClick={toggleLinks}>
+      <Center inline>
+        <Box component="span" mr={5}>
+          Features
+        </Box>
+        <IconChevronDown size={16} color={isDark ? theme.colors.blue[3] : theme.colors.blue[6]} />
+      </Center>
+    </UnstyledButton>
+    <Collapse in={linksOpened}>{links}</Collapse>
 
-          <Group justify="center" grow pb="xl" px="md">
-            <Button variant="default">Log in</Button>
-            <Button>Sign up</Button>
-          </Group>
-        </ScrollArea>
-      </Drawer>
+    <Link to="/course" className={classes.link} onClick={closeDrawer}>
+      Courses
+    </Link>
+
+    <Link to="/analyticdashboard" className={classes.link} onClick={closeDrawer}>
+      Analytics
+    </Link>
+
+    <Divider my="sm" />
+
+    <Group justify="center" grow pb="xl" px="md">
+      <Link to="/login" onClick={closeDrawer}>
+        <Button variant="default">Log in</Button>
+      </Link>
+      <Link to="/signup" onClick={closeDrawer}>
+        <Button>Sign up</Button>
+      </Link>
+    </Group>
+  </ScrollArea>
+</Drawer>
     </Box>
   );
 }

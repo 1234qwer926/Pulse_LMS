@@ -94,10 +94,8 @@ Back navigation Icon and its functionality
 Home Should have anchor tag
 
 In Navigation course should not have the groups
-course Content for user should be have like the article cards from the manatine ui----Done
 
-Learning view material should have the complete button 
-content in learning material should have should be formated correctly and also need the allignments data from the backend
+
 
 make api calls accordingly to the group insted of getting the enterprises groups data 
 Get the data for the Analytic Dashboard
