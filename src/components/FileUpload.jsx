@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button, FileInput, TextInput, Box, Text, Group, Paper, Title } from '@mantine/core';
 import { IconUpload, IconLink } from '@tabler/icons-react';
+import GeminiChatModal from './GeminiChatModal';
 
 function FileUploadComponent() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -114,6 +115,7 @@ function FileUploadComponent() {
           )}
         </Box>
       </Box>
+      <GeminiChatModal />
     </Paper>
   );
 }

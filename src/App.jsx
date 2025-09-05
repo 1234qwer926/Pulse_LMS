@@ -21,6 +21,7 @@ import { AssignmentReview } from './components/LmsDashboard/AssignmentReview';
 import { Assignment } from './components/Course/Assignment';
 import { JotformAssignment } from './components/Course/JotformAssignment';
 import FileUploadComponent from './components/FileUpload';
+import GeminiChatModal from './components/GeminiChatModal';
 
 import './App.css';
 
@@ -51,8 +52,10 @@ function App() {
           <Route path="/course/:courseId/assignment" element={<Assignment />} />
           <Route path="/assignment/:jotformId" element={<JotformAssignment />} />
           <Route path="/fileupload" element={<FileUploadComponent />} />
+          <Route path="/chatmodal" element={<GeminiChatModal />} />
         </Routes>
         <FooterLinks />
+        <GeminiChatModal/>
       </Router>
     </div>
   );

@@ -535,7 +535,7 @@ export function JotformAssignment() {
       formData.append('timestamp', answerData.timestamp);
       formData.append('jotformId', jotformId);
       formData.append('courseName', courseName);
-      
+      console.log(formdata)
       // Replace with your actual API endpoint
       await axios.post('http://localhost:8081/api/submit-answer', formData, {
         headers: {
