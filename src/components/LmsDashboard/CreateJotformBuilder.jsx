@@ -857,7 +857,7 @@ export function CreateJotformBuilder() {
     // Post the data to backend using Axios
     try {
       console.log(fullData);
-      const response = await axios.post('http://localhost:8081/api/jotforms', fullData, {
+      const response = await axios.post('http://18.60.40.186:8081/api/jotforms', fullData, {
         headers: {
           'Content-Type': 'application/json',
         },

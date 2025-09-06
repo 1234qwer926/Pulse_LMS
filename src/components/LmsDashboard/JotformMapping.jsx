@@ -32,7 +32,7 @@ export function JotformMapping(props) {
   const fetchJotformNames = async () => {
     setLoadingForms(true);
     try {
-      const response = await axios.get('http://localhost:8081/api/jotforms/names');
+      const response = await axios.get('http://18.60.40.186:8081/api/jotforms/names');
       setJotformNames(response.data);
     } catch (error) {
       console.error('Error fetching jotform names', error);
@@ -46,7 +46,7 @@ export function JotformMapping(props) {
   const fetchExistingCourses = async () => {
     setLoadingCourses(true);
     try {
-      const response = await axios.get('http://localhost:8081/api/courses/names');
+      const response = await axios.get('http://18.60.40.186:8081/api/courses/names');
       setCourseNames(response.data); // Assuming response is a list of distinct course names
     } catch (error) {
       console.error('Error fetching existing courses', error);
@@ -90,7 +90,7 @@ export function JotformMapping(props) {
       if (values.pdfFile) formData.append('pdfFile', values.pdfFile);
 
       console.log(formData)
-      const response = await axios.post('http://localhost:8081/api/courses/learning', formData, {
+      const response = await axios.post('http://18.60.40.186:8081/api/courses/learning', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -130,7 +130,7 @@ export function JotformMapping(props) {
       };
 
 
-      const response = await axios.post('http://localhost:8081/api/courses/assignment', payload, {
+      const response = await axios.post('http://18.60.40.186:8081/api/courses/assignment', payload, {
         headers: {
           'Content-Type': 'application/json',
         },
