@@ -26,6 +26,7 @@ export function JotformManagement() {
     setLoading(true);
     try {
       const response = await axios.get('https://18.60.40.186/api/jotforms');
+  
       setJotforms(response.data);
     } catch (error) {
       console.error('Error fetching Jotforms:', error);
@@ -50,6 +51,7 @@ export function JotformManagement() {
   const confirmDelete = async (formToDelete) => {
     try {
       await axios.delete(`https://18.60.40.186/api/jotforms/${formToDelete.id}`);
+      
       // Update state immediately for a responsive UI
       setJotforms((currentForms) =>
         currentForms.filter((form) => form.id !== formToDelete.id)

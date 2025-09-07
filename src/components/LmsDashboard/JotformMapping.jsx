@@ -33,6 +33,7 @@ export function JotformMapping(props) {
     setLoadingForms(true);
     try {
       const response = await axios.get('https://18.60.40.186/api/jotforms/names');
+
       setJotformNames(response.data);
     } catch (error) {
       console.error('Error fetching jotform names', error);
@@ -47,6 +48,7 @@ export function JotformMapping(props) {
     setLoadingCourses(true);
     try {
       const response = await axios.get('https://18.60.40.186/api/courses/names');
+
       setCourseNames(response.data); // Assuming response is a list of distinct course names
     } catch (error) {
       console.error('Error fetching existing courses', error);
@@ -90,6 +92,7 @@ export function JotformMapping(props) {
       if (values.pdfFile) formData.append('pdfFile', values.pdfFile);
 
       console.log(formData)
+
       const response = await axios.post('https://18.60.40.186/api/courses/learning', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -130,6 +133,7 @@ export function JotformMapping(props) {
       };
 
 
+      
       const response = await axios.post('https://18.60.40.186/api/courses/assignment', payload, {
         headers: {
           'Content-Type': 'application/json',
