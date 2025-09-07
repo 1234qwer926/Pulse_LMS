@@ -10,8 +10,10 @@ import {
   Title,
 } from '@mantine/core';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export function LmsDashboard() {
+  const navigate = useNavigate();
   return (
     // background: 'var(--mantine-color-dark-8)',
     <Box style={{  padding: '32px 0' }}>
@@ -123,6 +125,10 @@ export function LmsDashboard() {
           </Link>
         </SimpleGrid>
       </Container>
+      <button onClick={() => navigate("/fileupload")}>
+        File Upload
+      </button>
+
     </Box>
   );
 }
