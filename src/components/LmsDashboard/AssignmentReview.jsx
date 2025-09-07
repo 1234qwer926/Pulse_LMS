@@ -15,7 +15,7 @@ export function AssignmentReview() {
     const fetchAssignmentDetails = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`https://18.60.40.186:8081/api/assignment/${courseId}/${userId}`);
+        const response = await axios.get(`https://18.60.40.186/api/assignment/${courseId}/${userId}`);
         const dataWithEditingState = response.data.map(item => ({
           ...item,
           editing: false,
@@ -51,7 +51,7 @@ export function AssignmentReview() {
     if (!itemToSave) return;
     
     try {
-      await axios.put(`https://18.60.40.186:8081/api/assignment/score/${id}`, { finalScore: itemToSave.tempScore });
+      await axios.put(`https://18.60.40.186/api/assignment/score/${id}`, { finalScore: itemToSave.tempScore });
       setAssignment(assignment.map(item =>
         item.id === id ? { ...item, finalScore: itemToSave.tempScore, editing: false } : item
       ));

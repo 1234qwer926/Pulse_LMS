@@ -47,7 +47,7 @@ function GeminiChatModal() {
 
     try {
       // API call to your corrected POST endpoint
-      const response = await fetch('https://18.60.40.186:8081/api/gemini/ask', {
+      const response = await fetch('https://18.60.40.186/api/gemini/ask', {
         method: 'POST',
         headers: {
           'Content-Type': 'text/plain', // Sending the prompt as plain text
