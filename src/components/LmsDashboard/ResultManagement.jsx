@@ -12,7 +12,7 @@ export function ResultManagement() {
   const fetchCourseResults = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`http://localhost:8081/api/results?group=${selectedGroup}`);
+      const response = await axios.get(`  https://18.60.40.186/api/results?group=${selectedGroup}`);
       setCourses(response.data);
     } catch (error) {
       console.error(`Error fetching results for group ${selectedGroup}:`, error);

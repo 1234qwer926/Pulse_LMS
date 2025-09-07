@@ -30,7 +30,7 @@ export function CourseManagement() {
   const fetchCourses = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`http://localhost:8081/api/courses?group=${selectedGroup}`);
+      const response = await axios.get(`  https://18.60.40.186/api/courses?group=${selectedGroup}`);
       console.log(response.data);
       setCourses(response.data);
     } catch (error) {
@@ -67,7 +67,7 @@ export function CourseManagement() {
     if (!courseToDelete) return;
 
     try {
-      await axios.delete(`http://localhost:8081/api/courses/${courseToDelete.id}`);
+      await axios.delete(`  https://18.60.40.186/api/courses/${courseToDelete.id}`);
       // Refresh the list of courses after successful deletion
       setCourses(courses.filter((course) => course.id !== courseToDelete.id));
       closeDeleteModal(); // Close the modal

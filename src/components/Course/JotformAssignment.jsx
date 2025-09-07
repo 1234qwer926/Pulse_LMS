@@ -273,7 +273,7 @@ export function JotformAssignment() {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get(`http://localhost:8081/api/jotforms`);
+      const response = await axios.get(`  https://18.60.40.186/api/jotforms`);
       const foundForm = response.data.find(form => form.jotformName === jotformId);
       
       if (foundForm) {
@@ -432,7 +432,7 @@ export function JotformAssignment() {
       formData.append('jotformId', jotformId);
       formData.append('courseName', courseName);
       
-      await axios.post('http://localhost:8081/api/submit-answer', formData, {
+      await axios.post('  https://18.60.40.186/api/submit-answer', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
     } catch (error) {

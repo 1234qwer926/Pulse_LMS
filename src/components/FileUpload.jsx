@@ -22,7 +22,7 @@ function FileUploadComponent() {
     formData.append('file', selectedFile);
 
     try {
-      const response = await fetch('http://localhost:8081/upload', {
+      const response = await fetch('  https://18.60.40.186/upload', {
         method: 'POST',
         body: formData,
       });
@@ -50,7 +50,7 @@ function FileUploadComponent() {
 
     setStatusMessage(`Generating URL for key: ${fileKey}...`);
     try {
-      const response = await fetch(`http://localhost:8081/generate-presigned-url/${fileKey}`);
+      const response = await fetch(`  https://18.60.40.186/generate-presigned-url/${fileKey}`);
       const url = await response.text();
 
       if (response.ok) {
