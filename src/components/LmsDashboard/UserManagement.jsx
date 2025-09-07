@@ -23,7 +23,7 @@ export function UserManagement() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('https://18.60.40.186/api/user-mappings');
+      const response = await axios.get('http://localhost:8081/api/user-mappings');
       setUsers(response.data);
     } catch (error) {
       console.error('Error fetching user mappings:', error);
@@ -44,7 +44,7 @@ export function UserManagement() {
 
   const confirmDelete = async (userToDelete) => {
     try {
-      await axios.delete(`https://18.60.40.186/api/user-mappings/${userToDelete.id}`);
+      await axios.delete(`http://localhost:8081/api/user-mappings/${userToDelete.id}`);
       setUsers((currentUsers) =>
         currentUsers.filter((user) => user.id !== userToDelete.id)
       );

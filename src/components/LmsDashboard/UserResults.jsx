@@ -15,7 +15,7 @@ export function UserResults() {
     const fetchUserResults = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`https://18.60.40.186/api/results/course/${courseId}`);
+        const response = await axios.get(`http://localhost:8081/api/results/course/${courseId}`);
         setResults(response.data);
       } catch (error) {
         console.error(`Error fetching user results for course ${courseId}:`, error);
