@@ -169,7 +169,7 @@ export function JotformViewer({ jotformName, onBack, hideBackButton = false, onS
       setError(null);
       setPageIndex(0); // Reset to first page on new form load
       try {
-        const response = await axios.get(`http://18.60.40.186:8081/api/jotforms`);
+        const response = await axios.get(`https://18.60.40.186:8081/api/jotforms`);
         const foundForm = response.data.find(form => form.jotformName === jotformName);
         
         if (foundForm) {
