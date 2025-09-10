@@ -38,7 +38,7 @@ const handleSubmit = async (values) => {
   try {
     // --- CORRECTED URL ---
     // Change this from /api/mappings/map-user to /api/user-mappings
-    const response = await fetch('  https://18.60.40.186/api/user-mappings', {
+    const response = await fetch(' http://localhost:8081/api/user-mappings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: values.email, groupName: values.group }),

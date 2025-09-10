@@ -16,7 +16,7 @@ export function Course() {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.get(`  https://18.60.40.186/api/courses?group=${selectedGroup}`);
+        const response = await axios.get(` http://localhost:8081/api/courses?group=${selectedGroup}`);
         setCourses(response.data);
       } catch (err) {
         setError("Failed to fetch courses. Please try again later.");

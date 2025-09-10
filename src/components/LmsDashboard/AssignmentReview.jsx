@@ -8,23 +8,24 @@ export function AssignmentReview() {
   const { courseId, userId } = useParams();
   const location = useLocation();
   const { username } = location.state || { username: 'User' };
-  const [assignment, setAssignment] = useState([]);
+  const [answers, setAnswers] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchAssignmentDetails = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`  https://18.60.40.186/api/assignment/${courseId}/${userId}`);
+        // **FIXED**: URL now points to the new, correct backend endpoint
+        const response = await axios.get(`http://localhost:8081/api/results/submissions/${courseId}/${userId}`);
         const dataWithEditingState = response.data.map(item => ({
           ...item,
           editing: false,
           tempScore: item.finalScore
         }));
-        setAssignment(dataWithEditingState);
+        setAnswers(dataWithEditingState);
       } catch (error) {
         console.error('Error fetching assignment details:', error);
-        setAssignment([]);
+        setAnswers([]);
       } finally {
         setLoading(false);
       }
@@ -35,24 +36,25 @@ export function AssignmentReview() {
   }, [courseId, userId]);
 
   const handleEditToggle = (id) => {
-    setAssignment(assignment.map(item =>
+    setAnswers(answers.map(item =>
       item.id === id ? { ...item, editing: !item.editing, tempScore: item.finalScore } : item
     ));
   };
   
   const handleScoreChange = (id, value) => {
-    setAssignment(assignment.map(item =>
+    setAnswers(answers.map(item =>
       item.id === id ? { ...item, tempScore: value } : item
     ));
   };
 
   const handleSaveScore = async (id) => {
-    const itemToSave = assignment.find(item => item.id === id);
+    const itemToSave = answers.find(item => item.id === id);
     if (!itemToSave) return;
     
     try {
-      await axios.put(`  https://18.60.40.186/api/assignment/score/${id}`, { finalScore: itemToSave.tempScore });
-      setAssignment(assignment.map(item =>
+      // **FIXED**: URL now points to the correct endpoint, and `id` is the answer ID
+      await axios.put(`http://localhost:8081/api/results/answer/${id}`, { finalScore: itemToSave.tempScore });
+      setAnswers(answers.map(item =>
         item.id === id ? { ...item, finalScore: itemToSave.tempScore, editing: false } : item
       ));
     } catch (error) {
@@ -60,7 +62,8 @@ export function AssignmentReview() {
     }
   };
   
-  const totalFinalScore = assignment.reduce((acc, curr) => acc + curr.finalScore, 0);
+  const totalFinalScore = answers.reduce((acc, curr) => acc + curr.finalScore, 0);
+  const averageFinalScore = answers.length > 0 ? (totalFinalScore / answers.length) : 0;
 
   return (
     <Container size="xl" py="xl">
@@ -74,20 +77,20 @@ export function AssignmentReview() {
           <Table.Thead>
             <Table.Tr>
               <Table.Th>Question</Table.Th>
-              <Table.Th>User Answer</Table.Th>
-              <Table.Th>Content Link</Table.Th>
-              <Table.Th>GPT Score</Table.Th>
+              <Table.Th>User Answer (Transcript)</Table.Th>
+              <Table.Th>Video</Table.Th>
+              <Table.Th>AI Score</Table.Th>
               <Table.Th>Final Score</Table.Th>
               <Table.Th>Actions</Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
-            {assignment.map(item => (
+            {answers.map(item => (
               <Table.Tr key={item.id}>
                 <Table.Td>{item.question}</Table.Td>
                 <Table.Td>{item.userAnswer}</Table.Td>
                 <Table.Td>
-                  <a href={item.contentLink} target="_blank" rel="noopener noreferrer">View Content</a>
+                  <a href={item.contentLink} target="_blank" rel="noopener noreferrer">View Video</a>
                 </Table.Td>
                 <Table.Td>{item.gptScore}</Table.Td>
                 <Table.Td>
@@ -96,12 +99,12 @@ export function AssignmentReview() {
                       value={item.tempScore}
                       onChange={(value) => handleScoreChange(item.id, value)}
                       min={0}
-                      max={100} // Assuming max score is 100
+                      max={100}
                       size="xs"
                       style={{ width: 80 }}
                     />
                   ) : (
-                    item.finalScore
+                    item.finalScore.toFixed(2)
                   )}
                 </Table.Td>
                 <Table.Td>
@@ -120,8 +123,8 @@ export function AssignmentReview() {
           </Table.Tbody>
           <Table.Tfoot>
             <Table.Tr>
-              <Table.Td colSpan={4} style={{ textAlign: 'right', fontWeight: 'bold' }}>Total Score</Table.Td>
-              <Table.Td style={{ fontWeight: 'bold' }}>{totalFinalScore}</Table.Td>
+              <Table.Td colSpan={4} style={{ textAlign: 'right', fontWeight: 'bold' }}>Average Final Score</Table.Td>
+              <Table.Td style={{ fontWeight: 'bold' }}>{averageFinalScore.toFixed(2)}%</Table.Td>
               <Table.Td />
             </Table.Tr>
           </Table.Tfoot>

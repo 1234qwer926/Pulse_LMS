@@ -15,7 +15,7 @@ export function UserResults() {
     const fetchUserResults = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`  https://18.60.40.186/api/results/course/${courseId}`);
+        const response = await axios.get(`http://localhost:8081/api/results/course/${courseId}`);
         setResults(response.data);
       } catch (error) {
         console.error(`Error fetching user results for course ${courseId}:`, error);
@@ -43,15 +43,16 @@ export function UserResults() {
           <Table.Thead>
             <Table.Tr>
               <Table.Th>Username</Table.Th>
-              <Table.Th>Score</Table.Th>
+              <Table.Th>Average Score</Table.Th>
               <Table.Th>Actions</Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
             {results.map((user) => (
-              <Table.Tr key={user.userId}>
+              // **FIXED**: Using a more unique key since userId might not be unique across all courses.
+              <Table.Tr key={`${courseId}-${user.userId}`}>
                 <Table.Td>{user.username}</Table.Td>
-                <Table.Td>{user.score.toFixed(2)}</Table.Td>
+                <Table.Td>{user.score.toFixed(2)}%</Table.Td>
                 <Table.Td>
                   <Button variant="outline" size="xs" onClick={() => handleUserClick(user)}>
                     View Details

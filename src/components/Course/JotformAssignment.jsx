@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Container, 
-  Title, 
-  Text, 
-  Button, 
-  Box, 
-  Group, 
-  Alert, 
+import {
+  Container,
+  Title,
+  Text,
+  Button,
+  Box,
+  Group,
+  Alert,
   Badge,
   Card,
   Stack,
@@ -16,8 +16,8 @@ import {
   Divider,
   Progress
 } from '@mantine/core';
-import { 
-  IconCamera, 
+import {
+  IconCamera,
   IconVideo,
   IconCheck,
   IconAlertCircle,
@@ -38,53 +38,55 @@ import Webcam from 'react-webcam';
 import * as faceapi from 'face-api.js';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
+
 export function JotformAssignment() {
   const { jotformId } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const courseName = searchParams.get('course');
-
   // Step management
   const [step, setStep] = useState('setup');
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
-
   // Webcam states
   const [webcamReady, setWebcamReady] = useState(false);
   const [webcamError, setWebcamError] = useState(null);
-  
+
+
   // Photo states
   const [photoTaken, setPhotoTaken] = useState(false);
   const [capturedPhoto, setCapturedPhoto] = useState(null);
-  
+
+
   // Assignment states
   const [formData, setFormData] = useState(null);
   const [jotformContent, setJotformContent] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
+
   // Random number states
   const [randomInteger, setRandomInteger] = useState(null);
   const [randomNumber, setRandomNumber] = useState(null);
   const [processedPages, setProcessedPages] = useState([]);
-  
+
+
   // Recording states
   const [currentRecording, setCurrentRecording] = useState(null);
   const [recordedAnswers, setRecordedAnswers] = useState([]);
-  
+
+
   // Proctoring states
   const [fullscreen, setFullscreen] = useState(false);
   const [monitoring, setMonitoring] = useState(false);
   const [showLiveVideo, setShowLiveVideo] = useState(true);
-  
+
+
   // Face recognition states
   const [modelsLoaded, setModelsLoaded] = useState(false);
   const [faceDetected, setFaceDetected] = useState(false);
   const [multipleFaces, setMultipleFaces] = useState(false);
   const [lightingIssue, setLightingIssue] = useState(false);
 
-  // Video modal states
-  const [showVideoModal, setShowVideoModal] = useState(false);
-  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
 
   // Speech Recognition state
   const {
@@ -94,6 +96,7 @@ export function JotformAssignment() {
     browserSupportsSpeechRecognition
   } = useSpeechRecognition();
 
+
   const webcamRef = useRef(null);
   const liveVideoRef = useRef(null);
   const faceCanvasRef = useRef(null);
@@ -101,10 +104,12 @@ export function JotformAssignment() {
   const streamRef = useRef(null);
   const transcriptRef = useRef(''); // Ref to hold the latest transcript
 
+
   // Keep the ref updated with the latest transcript
   useEffect(() => {
     transcriptRef.current = transcript;
   }, [transcript]);
+
 
   // Video constraints
   const videoConstraints = {
@@ -112,13 +117,13 @@ export function JotformAssignment() {
     height: 480,
     facingMode: "user"
   };
-
   const liveVideoConstraints = {
     width: 220,
     height: 165,
     facingMode: "user",
     frameRate: 30
   };
+
 
   // Initialize component and load face detection models
   useEffect(() => {
@@ -136,8 +141,8 @@ export function JotformAssignment() {
         console.error('Error loading face models:', error);
       }
     };
-
     loadFaceModels();
+
 
     return () => {
       if (streamRef.current) {
@@ -146,6 +151,7 @@ export function JotformAssignment() {
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
     };
   }, []);
+
 
   // Face detection logic
   useEffect(() => {
@@ -156,15 +162,18 @@ export function JotformAssignment() {
           const canvas = faceCanvasRef.current;
           if (canvas) {
             const detections = await faceapi.detectAllFaces(
-              video, 
+              video,
               new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.5 })
             );
+
 
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+
             const brightness = await checkBrightness(video);
             setLightingIssue(brightness < 50);
+
 
             if (detections.length === 0) {
               setFaceDetected(false);
@@ -177,11 +186,13 @@ export function JotformAssignment() {
               setMultipleFaces(false);
             }
 
+
             const resizedDetections = faceapi.resizeResults(detections, {
               width: video.videoWidth,
               height: video.videoHeight
             });
-            
+
+
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             faceapi.draw.drawDetections(canvas, resizedDetections);
@@ -189,10 +200,12 @@ export function JotformAssignment() {
         }
       };
 
+
       const interval = setInterval(detectFaces, 2000);
       return () => clearInterval(interval);
     }
   }, [modelsLoaded, step, lightingIssue]);
+
 
   // Check brightness level
   const checkBrightness = async (video) => {
@@ -200,48 +213,22 @@ export function JotformAssignment() {
     const ctx = canvas.getContext('2d');
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-    
+
+
     ctx.drawImage(video, 0, 0);
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const data = imageData.data;
-    
+
+
     let brightness = 0;
     for (let i = 0; i < data.length; i += 4) {
       brightness += (data[i] + data[i + 1] + data[i + 2]) / 3;
     }
-    
+
+
     return brightness / (data.length / 4);
   };
 
-  // Enhanced console logging function
-  const logSubmissionData = (data) => {
-    console.group('🎯 ASSIGNMENT SUBMISSION');
-    console.group('📚 Assignment Details');
-    console.table(data.assignment);
-    console.groupEnd();
-    
-    console.group('📝 Recorded Answers');
-    data.answers.forEach((answer, index) => {
-      console.group(`Video ${index + 1}`);
-      console.log('Page:', answer.pageNumber);
-      console.log('Question:', answer.questionText);
-      console.log('Transcript:', answer.transcript);
-      console.log('File Size:', `${Math.round(answer.videoSize / 1024)} KB`);
-      console.log('Timestamp:', new Date(answer.timestamp).toLocaleString());
-      console.log('Video URL:', answer.videoUrl);
-      console.groupEnd();
-    });
-    console.groupEnd();
-    
-    console.group('🔍 Proctoring Status');
-    console.table(data.proctoring);
-    console.groupEnd();
-    console.group('👤 Identity Verification');
-    console.log('Photo Captured:', data.identity.photoTaken);
-    console.log('Photo Size:', data.identity.photo ? 'Available' : 'Not available');
-    console.groupEnd();
-    console.groupEnd();
-  };
 
   const handleUserMedia = (stream) => {
     setWebcamReady(true);
@@ -249,10 +236,12 @@ export function JotformAssignment() {
     setWebcamError(null);
   };
 
+
   const handleUserMediaError = (error) => {
     setWebcamError(error.message);
     setWebcamReady(false);
   };
+
 
   const takePhoto = () => {
     if (webcamRef.current) {
@@ -264,18 +253,21 @@ export function JotformAssignment() {
     }
   };
 
+
   const retakePhoto = () => {
     setCapturedPhoto(null);
     setPhotoTaken(false);
   };
 
+
   const loadJotformContent = async () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get(`  https://18.60.40.186/api/jotforms`);
+      const response = await axios.get(`http://localhost:8081/api/jotforms`);
       const foundForm = response.data.find(form => form.jotformName === jotformId);
-      
+
+
       if (foundForm) {
         setFormData(foundForm);
         let randomInt = null;
@@ -288,20 +280,24 @@ export function JotformAssignment() {
           }
           if (randomInt) break;
         }
-        
+
+
         if (randomInt) {
           setRandomInteger(randomInt);
           const generatedRandomNumber = Math.floor(Math.random() * randomInt) + 1;
           setRandomNumber(generatedRandomNumber);
-          
+
+
           const processedPagesData = foundForm.pages.map(page => {
             const paragraphs = page.elements
               .filter(elem => elem.tagName === 'paragraph')
               .sort((a, b) => a.sequence - b.sequence);
-            
+
+
             const videoRecording = page.elements.find(elem => elem.tagName === 'videorecording');
             const selectedParagraph = paragraphs[generatedRandomNumber - 1];
-            
+
+
             return {
               pageNumber: page.page,
               selectedParagraph: selectedParagraph || null,
@@ -309,7 +305,8 @@ export function JotformAssignment() {
               totalParagraphs: paragraphs.length
             };
           });
-          
+
+
           setProcessedPages(processedPagesData);
           setCurrentPageIndex(0);
           setJotformContent({
@@ -331,13 +328,16 @@ export function JotformAssignment() {
     }
   };
 
+
   const handleNextPage = () => {
     if (currentPageIndex < processedPages.length - 1) {
       setCurrentPageIndex(currentPageIndex + 1);
     }
   };
 
+
   const toggleLiveVideo = () => setShowLiveVideo(!showLiveVideo);
+
 
   const enterFullscreen = () => {
     if (document.documentElement.requestFullscreen) {
@@ -347,6 +347,7 @@ export function JotformAssignment() {
       document.addEventListener('fullscreenchange', handleFullscreenChange);
     }
   };
+
 
   const handleFullscreenChange = () => {
     if (!document.fullscreenElement) {
@@ -359,28 +360,31 @@ export function JotformAssignment() {
     }
   };
 
+
   const startRecording = async () => {
     if (streamRef.current && !currentRecording) {
       try {
         resetTranscript();
         SpeechRecognition.startListening({ continuous: true, language: 'en-US' });
-
         const mediaRecorder = new MediaRecorder(streamRef.current, {
           mimeType: 'video/webm; codecs=vp9,opus',
           audioBitsPerSecond: 128000,
           videoBitsPerSecond: 2500000
         });
-        
+
+
         const chunks = [];
         mediaRecorder.ondataavailable = (event) => {
           if (event.data && event.data.size > 0) chunks.push(event.data);
         };
-        
+
+
         mediaRecorder.onstop = () => {
           SpeechRecognition.stopListening();
           const blob = new Blob(chunks, { type: 'video/webm' });
           const url = URL.createObjectURL(blob);
-          
+
+
           const currentPage = processedPages[currentPageIndex];
           const questionData = {
             id: Date.now(),
@@ -388,13 +392,13 @@ export function JotformAssignment() {
             url,
             pageNumber: currentPageIndex + 1,
             questionText: currentPage.selectedParagraph?.content || 'No question text',
-            transcript: transcriptRef.current, // FIX: Use ref to get latest transcript
+            transcript: transcriptRef.current, // Use ref to get latest transcript
             timestamp: new Date().toISOString(),
             randomQuestionNumber: randomNumber
           };
-          
+
+
           setRecordedAnswers(prev => [...prev, questionData]);
-          sendAnswerToBackend(questionData);
           setCurrentRecording(null);
           notifications.show({
             title: 'Recording Saved',
@@ -402,17 +406,20 @@ export function JotformAssignment() {
             color: 'green'
           });
         };
-        
+
+
         mediaRecorderRef.current = mediaRecorder;
         mediaRecorder.start();
         setCurrentRecording({ startTime: Date.now(), pageNumber: currentPageIndex + 1 });
         notifications.show({ title: 'Recording Started', message: 'Speak your answer now...', color: 'blue' });
-        
+
+
       } catch (error) {
         notifications.show({ title: 'Recording Failed', message: 'Could not start recording.', color: 'red' });
       }
     }
   };
+
 
   const stopRecording = () => {
     if (mediaRecorderRef.current && currentRecording) {
@@ -420,50 +427,99 @@ export function JotformAssignment() {
     }
   };
 
-  const sendAnswerToBackend = async (answerData) => {
-    try {
-      const formData = new FormData();
-      formData.append('video', answerData.blob, `answer_page_${answerData.pageNumber}.webm`);
-      formData.append('questionText', answerData.questionText);
-      formData.append('transcript', answerData.transcript);
-      formData.append('pageNumber', answerData.pageNumber);
-      formData.append('randomQuestionNumber', answerData.randomQuestionNumber);
-      formData.append('timestamp', answerData.timestamp);
-      formData.append('jotformId', jotformId);
-      formData.append('courseName', courseName);
-      
-      await axios.post('  https://18.60.40.186/api/submit-answer', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-    } catch (error) {
-      console.error('Error sending answer to backend:', error);
-    }
-  };
 
+  // Helper function to convert base64 data URL to a Blob
+  const dataURLtoBlob = (dataurl) => {
+    const arr = dataurl.split(',');
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], { type: mime });
+  }
+
+
+  // ### FULLY CORRECTED submitAssignment function ###
   const submitAssignment = async () => {
     try {
-      const completeSubmissionData = {
-        assignment: {
-          jotformId, courseName, totalPages: processedPages.length,
-          randomNumber, randomInteger, title: jotformContent?.title
-        },
-        identity: { photo: capturedPhoto, photoTaken },
-        answers: recordedAnswers.map(ans => ({ ...ans, videoUrl: ans.url, videoSize: ans.blob.size, videoType: ans.blob.type })),
-        proctoring: { faceDetected, multipleFaces, lightingIssue, modelsLoaded },
-        session: { submissionTime: new Date().toISOString(), totalRecordedAnswers: recordedAnswers.length }
+      const username = "rahul";
+      const userid = "user101";
+
+
+      // 1. Prepare the JSON payload
+      const submissionDto = {
+        jotformId: jotformId, // Use the jotformId from params
+        username: username,
+        userId: userid,
+        warnings: [`MultipleFaces Detected: ${multipleFaces}`, `Lighting Issue: ${lightingIssue}`],
+        answers: recordedAnswers.map(ans => ({
+          questionText: ans.questionText,
+          transcript: ans.transcript,
+        })),
       };
 
-      logSubmissionData(completeSubmissionData);
-      setShowVideoModal(true);
-      
+
+      // 2. Create a new FormData object
+      const formData = new FormData();
+
+
+      // 3. Append the JSON payload as a string with the key 'submission'
+      // This is more reliable than creating a Blob for the JSON part.
+      formData.append('submission', JSON.stringify(submissionDto));
+
+
+      // 4. Append the photo file with the key 'photo'
+      if (capturedPhoto) {
+        const photoBlob = dataURLtoBlob(capturedPhoto);
+        formData.append('photo', photoBlob, 'identity-photo.jpg');
+      }
+
+
+      // 5. Append all video files with the key 'videos'
+      recordedAnswers.forEach((answer, index) => {
+        formData.append('videos', answer.blob, `answer-video-${index + 1}.webm`);
+      });
+
+
+      console.log("--- Sending Data to Backend ---");
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
+      }
+      console.log("-------------------------------");
+
+
+      // 6. Send the request to the CORRECT backend URL
+      // The controller is mapped to "/submit-answer", not "/api/assignment/submit-answer"
+      await axios.post('http://localhost:8081/submit-answer', formData, {
+        headers: {
+          // Axios will automatically set 'Content-Type': 'multipart/form-data'
+        }
+      });
+
+
+      setStep('completed');
+
+
     } catch (error) {
-      console.error('❌ SUBMISSION ERROR:', error);
+      console.error('❌ SUBMISSION ERROR:', error.response ? error.response.data : error.message);
+      notifications.show({
+        title: 'Submission Failed',
+        message: error.response ? `Server Error: ${error.response.statusText}` : 'An unexpected error occurred.',
+        color: 'red'
+      });
     }
   };
+
+
+
 
   const goBack = () => {
     if (window.confirm('Exit assignment? Progress will be lost.')) navigate(-1);
   };
+
 
   // UI Components for each step
   if (step === 'setup') {
@@ -501,6 +557,7 @@ export function JotformAssignment() {
     );
   }
 
+
   if (step === 'photo') {
     return (
       <Container size="md" py="xl">
@@ -531,6 +588,7 @@ export function JotformAssignment() {
     );
   }
 
+
   if (step === 'verification') {
     return (
       <Container size="md" py="xl">
@@ -559,6 +617,7 @@ export function JotformAssignment() {
     );
   }
 
+
   if (step === 'exam') {
     if (!browserSupportsSpeechRecognition) {
       return <Container size="md" py="xl"><Alert color="red">Speech recognition not supported. Please use Chrome.</Alert></Container>;
@@ -572,45 +631,12 @@ export function JotformAssignment() {
     if (!processedPages.length) {
       return <Container size="md" py="xl"><Center><Text>No pages to display.</Text></Center></Container>;
     }
-
     const currentPage = processedPages[currentPageIndex];
     const isLastPage = currentPageIndex === processedPages.length - 1;
     const progressPercentage = ((currentPageIndex + 1) / processedPages.length) * 100;
-
     return (
       <Box>
         <style>{`@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }`}</style>
-        {showVideoModal && (
-          <Box style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Card shadow="xl" p="xl" radius="md" style={{ maxWidth: '90vw', maxHeight: '90vh', width: 800 }}>
-              <Group justify="space-between" mb="md">
-                <Title order={3}>Recorded Videos ({recordedAnswers.length})</Title>
-                <Button size="sm" variant="outline" onClick={() => setShowVideoModal(false)}>Close</Button>
-              </Group>
-              {recordedAnswers.length > 0 && (
-                <Stack>
-                  <Group justify="center" mb="md">
-                    {recordedAnswers.map((_, index) => <Button key={index} size="sm" variant={currentVideoIndex === index ? 'filled' : 'outline'} onClick={() => setCurrentVideoIndex(index)}>Video {index + 1}</Button>)}
-                  </Group>
-                  <Box ta="center">
-                    <Badge color="blue" size="lg" mb="md">Page {recordedAnswers[currentVideoIndex]?.pageNumber} - Q{randomNumber}</Badge>
-                    <Text size="sm" mb="md" style={{ maxHeight: 100, overflow: 'auto', padding: 10, background: '#f8f9fa', borderRadius: 8, textAlign: 'left' }}>
-                      <strong>Question:</strong> {recordedAnswers[currentVideoIndex]?.questionText}
-                    </Text>
-                    <Box mb="md" p="sm" style={{ background: '#f1f3f5', borderRadius: 4, maxHeight: 150, overflowY: 'auto', textAlign: 'left' }}>
-                      <Text weight={500}>Answer Transcript:</Text>
-                      <Text size="sm" color="dimmed">{recordedAnswers[currentVideoIndex]?.transcript || "No transcript recorded."}</Text>
-                    </Box>
-                    <video controls width="100%" height="400" style={{ borderRadius: 8, background: '#000' }} src={recordedAnswers[currentVideoIndex]?.url} key={recordedAnswers[currentVideoIndex]?.id}></video>
-                  </Box>
-                  <Group justify="center" mt="md">
-                    <Button color="green" onClick={() => { setShowVideoModal(false); setStep('completed'); }}>Complete Submission</Button>
-                  </Group>
-                </Stack>
-              )}
-            </Card>
-          </Box>
-        )}
         <Box style={{ position: 'fixed', top: 0, left: 0, right: 0, background: '#1a1a1a', color: 'white', padding: '8px 16px', zIndex: 1001, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Group>
             <Badge color="red" variant="dot">MONITORING</Badge>
@@ -671,6 +697,7 @@ export function JotformAssignment() {
     );
   }
 
+
   if (step === 'completed') {
     return (
       <Container size="md" py="xl">
@@ -682,6 +709,7 @@ export function JotformAssignment() {
       </Container>
     );
   }
+
 
   return null;
 }
