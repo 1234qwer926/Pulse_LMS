@@ -80,7 +80,7 @@ export function CourseManagement() {
   return (
     <Container size="lg" py="xl">
       <Group justify="space-between" mb="md">
-        <Title order={2}>Course Management</Title>
+        <Title order={2}>Topics Management</Title>
         <Button onClick={() => setMapModalOpened(true)}>Map Jotforms</Button>
       </Group>
 

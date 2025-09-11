@@ -113,13 +113,13 @@ export function JotformMapping(props) {
   const assignmentForm = useForm({
     initialValues: {
       courseName: '', // Now selected from existing
-      jotformName: '',
-      group: '',
+      jotformName: ''
+      // group: '',
     },
     validate: {
       courseName: (val) => (val ? null : 'Please select a course name'),
-      jotformName: (val) => (val ? null : 'Please select a jotform'),
-      group: (val) => (val ? null : 'Please select a group'),
+      jotformName: (val) => (val ? null : 'Please select a jotform')
+      // group: (val) => (val ? null : 'Please select a group'),
     },
   });
 
@@ -128,8 +128,8 @@ export function JotformMapping(props) {
     try {
       const payload = {
         courseName: values.courseName,
-        jotformName: values.jotformName,
-        group: values.group,
+        jotformName: values.jotformName
+        // group: values.group,
       };
 
 
@@ -275,7 +275,7 @@ export function JotformMapping(props) {
             />
 
 
-            <Select
+            {/* <Select
               label="Group"
               placeholder="Select group"
               required
@@ -284,7 +284,7 @@ export function JotformMapping(props) {
               onChange={(val) => assignmentForm.setFieldValue('group', val)}
               error={assignmentForm.errors.group}
               radius="md"
-            />
+            /> */}
 
 
             <Button type="submit" radius="xl" mt="md">
